@@ -1,13 +1,13 @@
 import { useId } from 'react';
 
-export function Portrait({ variant = 'detective', emotion = 'neutral', className = '', ...props }) {
+export function Portrait({ name, variant = 'detective', emotion = 'neutral', className = '', ...props }) {
   const id = useId().replace(/:/g, '');
   const suspect = variant === 'suspect';
   const victim = variant === 'victim';
   const shocked = emotion === 'shocked' || emotion === 'scared';
   const angry = emotion === 'angry' || emotion === 'suspicious';
   const happy = emotion === 'happy';
-  return <svg viewBox="0 0 480 680" className={className} role="img" aria-label={suspect ? 'Chân dung kẻ ẩn danh' : victim ? 'Linh, nhân vật trong vụ án' : 'An, thám tử trẻ'} {...props}>
+  return <svg viewBox="0 0 480 680" className={className} role="img" aria-label={name ? `Minh họa vector tạm dùng cho ${name}` : suspect ? 'Chân dung kẻ ẩn danh' : victim ? 'Nhân vật trong vụ án' : 'An, thám tử trẻ'} {...props}>
     <defs>
       <linearGradient id={`coat-${id}`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="var(--muted)"/><stop offset="1" stopColor="var(--background)"/></linearGradient>
       <linearGradient id={`face-${id}`}><stop stopColor="var(--card-foreground)"/><stop offset=".7" stopColor="var(--foreground)"/><stop offset="1" stopColor="var(--accent)"/></linearGradient>

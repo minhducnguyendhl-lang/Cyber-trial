@@ -27,10 +27,10 @@ export default function TitleScreen() {
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-6 py-10 sm:px-12 sm:py-16">
       <div className="max-w-2xl">
         <p className="mb-4 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[.25em] text-accent-foreground"><span className="h-px w-10 bg-chart-2"/> {t('Visual novel trinh thám', 'Detective visual novel')}</p>
-        <h1 data-text="NETTRAP" className="title-glitch font-heading text-[clamp(6rem,16vw,12.5rem)] font-black leading-[.78] tracking-[-.045em]">NET<span className="text-primary">TRAP</span></h1>
+        <h1 data-text="CYBER-M" className="title-glitch font-heading text-[clamp(4rem,12vw,9rem)] font-black leading-[.9] tracking-[-.045em]">CYBER<span className="text-primary">-M</span></h1>
         <div className="mt-6 max-w-md border-l-4 border-primary pl-4">
-          <p className="font-heading text-3xl font-semibold uppercase sm:text-4xl">{t('Đừng trở thành nạn nhân tiếp theo.', 'Don’t become the next victim.')}</p>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">{t('Một tin nhắn có thể là khởi đầu của cái bẫy. Điều tra dấu vết, vạch trần lời nói dối và bảo vệ người bạn của mình.', 'A message can be the start of a trap. Follow the evidence, expose the lie and protect your friends.')}</p>
+          <p className="font-heading text-3xl font-semibold uppercase sm:text-4xl">Phiên tòa không có nhân chứng</p>
+          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">Mười sinh viên. Bảy chương trong Mê Cung Số. Khi tin nhắn, giọng nói và bằng chứng đều có thể giả mạo, bạn sẽ tin vào điều gì? Điều tra cùng An, chất vấn Cyber-M và tìm đường đưa mọi người trở về.</p>
         </div>
         <div className="mt-8 flex max-w-sm flex-col gap-3">
           <Button onClick={begin} className="h-14 rounded-full bg-primary text-base font-extrabold uppercase tracking-wider text-primary-foreground shadow-lg transition-transform hover:scale-[1.02] hover:bg-primary/90"><ApperIcon name="Play" className="mr-2 h-5 w-5 fill-current"/>{t('Bắt Đầu', 'Start')}</Button>

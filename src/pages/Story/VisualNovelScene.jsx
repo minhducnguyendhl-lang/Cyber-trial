@@ -6,7 +6,7 @@ import ApperIcon from '@/components/ApperIcon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { scenesFor, TEXT_SPEEDS } from '@/components/nettrap/story';
+import { scenesFor, TEXT_SPEEDS, CAST } from '@/components/nettrap/story';
 import { useGame } from '@/components/nettrap/GameState';
 import SceneArt, { Portrait } from '@/components/nettrap/Art';
 import CluePanel from '@/components/nettrap/CluePanel';
@@ -73,7 +73,8 @@ export default function VisualNovelScene() {
         collectClue(node.clue_c);
         toast.success(t('Manh mối thu thập!', 'Evidence collected!'));
       }
-      setResponse(t('An: “Đúng hướng rồi. Kiểm chứng độc lập giúp chúng ta thoát khỏi câu chuyện mà kẻ gian dựng lên.”', 'An: “Independent verification breaks the scammer’s story. Keep this evidence.”'));
+      const clue = chapter.clues_c[node.clue_c];
+      setResponse(`Vật chứng — ${clue[0]}: “${clue[2]}”\n\nAn: “${node.reasoning_c || 'Kiểm chứng độc lập giúp chúng ta thoát khỏi câu chuyện mà kẻ gian dựng lên.'}”`);
     } else {
       setResponse(t('An: “Lựa chọn này khiến nạn nhân tiếp tục chịu áp lực. Chúng ta đã bỏ lỡ một manh mối. Bạn có thể xem lại cảnh để kiểm tra lần nữa.”', 'An: “This response leaves the victim under pressure. A clue was missed. Replay this scene to investigate again.”'));
       toast.info(t('Đừng vội. Có thể kiểm tra lại trong menu cảnh.', 'You can replay this scene from the scene menu.'));
@@ -99,22 +100,22 @@ export default function VisualNovelScene() {
       </div>
     </div>
     <div className="pointer-events-none relative mx-auto h-[35vh] min-h-52 max-w-5xl sm:h-[44vh] sm:min-h-72">
-      <Portrait variant="detective" emotion={node.speaker_c === 'An' ? node.emotion_c : 'suspicious'} className={`absolute bottom-[-12vh] left-[-8%] h-[58vh] min-h-80 w-[65%] transition-opacity duration-150 sm:left-0 sm:h-[68vh] sm:w-[50%] ${node.speaker_c === 'An' ? 'opacity-100' : 'opacity-40'}`}/>
-      <Portrait variant={node.speaker_c === chapter.suspect_c ? 'suspect' : 'victim'} emotion={node.emotion_c} className={`absolute bottom-[-12vh] right-[-9%] h-[57vh] min-h-80 w-[65%] transition-opacity duration-150 sm:right-0 sm:h-[66vh] sm:w-[50%] ${node.speaker_c === 'An' ? 'opacity-40' : 'opacity-100'}`}/>
+      <Portrait name="An" variant="detective" emotion={node.speaker_c === 'An' ? node.emotion_c : 'suspicious'} className={`absolute bottom-[-12vh] left-[-8%] h-[58vh] min-h-80 w-[65%] transition-opacity duration-150 sm:left-0 sm:h-[68vh] sm:w-[50%] ${node.speaker_c === 'An' ? 'opacity-100' : 'opacity-40'}`}/>
+      <Portrait name={node.speaker_c === 'An' ? chapter.victim_c.split(' · ')[0] : node.speaker_c} variant={CAST.find(p => p.name_c === node.speaker_c)?.variant_c || 'suspect'} emotion={node.emotion_c} className={`absolute bottom-[-12vh] right-[-9%] h-[57vh] min-h-80 w-[65%] transition-opacity duration-150 sm:right-0 sm:h-[66vh] sm:w-[50%] ${node.speaker_c === 'An' ? 'opacity-40' : 'opacity-100'}`}/>
     </div>
     <section className="relative z-20 mx-auto max-w-5xl px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
       <div className="panel-cut min-h-60 border border-border bg-background/95 p-5 shadow-lg sm:p-7">
         <div className="mb-4 flex items-center justify-between gap-3">
           <span className="panel-cut bg-primary px-5 py-1 font-heading text-xl font-bold text-primary-foreground">{node.speaker_c}</span>
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{node.choices_c ? t('Quyết định của bạn', 'Your decision') : t('Đối thoại', 'Dialogue')}</span>
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{node.investigation_c != null ? 'Khám nghiệm chứng cứ' : 'Đối thoại'}</span>
         </div>
-        <button type="button" onClick={next} className="game-focus block min-h-20 w-full text-left text-base leading-[1.9] sm:text-lg" aria-label={visible < text.length ? 'Hiện toàn bộ hội thoại' : 'Đọc tiếp hội thoại'}>
+        <button type="button" onClick={next} className="game-focus block min-h-20 w-full whitespace-pre-wrap break-words text-left text-base leading-[1.9] sm:text-lg" aria-label={visible < text.length ? 'Hiện toàn bộ hội thoại' : 'Đọc tiếp hội thoại'}>
           {response || text.slice(0, visible)}
           {visible < text.length && <span className="text-primary" aria-hidden="true">▌</span>}
         </button>
         {node.choices_c && !response && visible >= text.length ? <div className="mt-4 grid gap-2">
           {choiceOrder.map((originalIndex, displayIndex) => <motion.button key={`${save.scene_c}-${originalIndex}`} type="button" initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .15, delay: displayIndex * .04 }}
-            onClick={() => choose(originalIndex)} className="game-focus panel-cut flex min-h-12 items-center gap-3 border border-border bg-card px-4 py-3 text-left text-sm leading-relaxed transition-colors hover:border-primary hover:bg-muted">
+            onClick={() => choose(originalIndex)} className="game-focus panel-cut flex min-h-12 items-center gap-3 border border-border bg-card px-4 py-3 text-left text-sm leading-relaxed transition-colors duration-(--transition-fast) hover:border-primary hover:bg-muted active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50">
             <span className="font-heading text-xl font-bold text-primary">{String.fromCharCode(65 + displayIndex)}</span>{node.choices_c[originalIndex]}
           </motion.button>)}
         </div> : <div className="mt-4 flex justify-end"><Button onClick={next} variant="ghost" className="h-11 px-4 font-semibold text-accent-foreground hover:bg-secondary">{save.scene_c === scenes.length - 1 ? t('Xem manh mối', 'Review evidence') : t('Tiếp tục', 'Continue')}<ApperIcon name="ChevronRight" className="ml-2 h-4 w-4"/></Button></div>}

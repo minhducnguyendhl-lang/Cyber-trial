@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { CHAPTERS, TEXT_SPEEDS, LANGUAGES } from './story';
+import { CHAPTERS, TEXT_SPEEDS, LANGUAGES, scenesFor } from './story';
 
 const GameContext = createContext(null);
-const STORAGE_KEY = 'nettrap-save-v1';
+const STORAGE_KEY = 'cyber-trial-save-v2';
 const emptySave = () => ({
   version_c: 1, active_c: 0, scene_c: 0, viewed_c: [0], clues_c: [],
-  sessions_c: {}, completed_c: {}, has_session_c: false, newest_c: null,
+  sessions_c: {}, completed_c: {}, verdicts_c: {}, has_session_c: false, newest_c: null,
   settings_c: { muted_c: true, sfx_c: true, volume_c: 25, speed_c: TEXT_SPEEDS[1], language_c: LANGUAGES[0] }
 });
 function readSave() {
@@ -23,11 +23,11 @@ function readSave() {
     const cleanIndices = (value, max) => Array.isArray(value) ? [...new Set(value.filter(n => Number.isInteger(n) && n >= 0 && n < max))] : [];
     return {
       ...fallback, active_c: active,
-      scene_c: Math.max(0, Math.min(7, Math.floor(Number(raw.scene_c) || 0))),
-      viewed_c: cleanIndices(raw.viewed_c, 8),
+      scene_c: Math.max(0, Math.min(scenesFor(CHAPTERS[active]).length - 1, Math.floor(Number(raw.scene_c) || 0))),
+      viewed_c: cleanIndices(raw.viewed_c, scenesFor(CHAPTERS[active]).length),
       clues_c: cleanIndices(raw.clues_c, 5),
       sessions_c: raw.sessions_c && typeof raw.sessions_c === 'object' ? raw.sessions_c : {},
-      completed_c: completed, has_session_c: Boolean(raw.has_session_c),
+      completed_c: completed, verdicts_c: raw.verdicts_c && typeof raw.verdicts_c === 'object' ? raw.verdicts_c : {}, has_session_c: Boolean(raw.has_session_c),
       newest_c: Number.isInteger(raw.newest_c) ? raw.newest_c : null,
       settings_c: {
         ...fallback.settings_c,
@@ -120,8 +120,9 @@ export function GameProvider({ children }) {
     setSave(s => {
       const savedSession = s.sessions_c[index];
       const validClues = Array.isArray(savedSession?.clues_c) ? savedSession.clues_c.filter(n => Number.isInteger(n) && n >= 0 && n < 5) : [];
-      const validViewed = Array.isArray(savedSession?.viewed_c) ? savedSession.viewed_c.filter(n => Number.isInteger(n) && n >= 0 && n < 8) : [0];
-      return { ...s, active_c: index, scene_c: Math.min(7, Math.max(0, Number(savedSession?.scene_c) || 0)),
+      const sceneCount = scenesFor(CHAPTERS[index]).length;
+      const validViewed = Array.isArray(savedSession?.viewed_c) ? savedSession.viewed_c.filter(n => Number.isInteger(n) && n >= 0 && n < sceneCount) : [0];
+      return { ...s, active_c: index, scene_c: Math.min(sceneCount - 1, Math.max(0, Number(savedSession?.scene_c) || 0)),
         clues_c: validClues, viewed_c: validViewed, has_session_c: true };
     });
     return true;
@@ -142,9 +143,10 @@ export function GameProvider({ children }) {
       } } };
     });
   }
-  function finishChapter(stars) {
+  function finishChapter(stars, correct) {
     setSave(s => ({
       ...s, completed_c: { ...s.completed_c, [s.active_c]: Math.max(stars, s.completed_c[s.active_c] || 0) },
+      verdicts_c: { ...s.verdicts_c, [s.active_c]: { correct_c: Boolean(correct), stars_c: stars } },
       newest_c: s.active_c + 1 < CHAPTERS.length && !s.completed_c[s.active_c + 1] ? s.active_c + 1 : null
     }));
   }

@@ -30,7 +30,7 @@ export default function VerdictScreen() {
   const [debrief, setDebrief] = useState(false);
   const [read, setRead] = useState(false);
   const timer = useRef(null);
-  const choices = [chapter.action_c, 'Làm theo ngay để tránh mất cơ hội hoặc bị xử lý.', 'Trả thêm một khoản để lấy lại tiền hoặc quyền truy cập.'];
+  const choices = chapter.verdict_c;
   const actionOrder = save.active_c % 2 ? [1, 2, 0] : [2, 0, 1];
   const categories = CHAPTERS.map(c => c.category_c);
   const ready = category && evidence.length === 2 && action;
@@ -43,7 +43,7 @@ export default function VerdictScreen() {
   }
   function submit() {
     if (!ready || result) return;
-    const checks = [category === chapter.category_c, evidence.includes(0) && evidence.includes(2), action === chapter.action_c];
+    const checks = [category === chapter.category_c, evidence.includes(0) && evidence.includes(2), action === chapter.verdict_c[0]];
     const correct = checks.every(Boolean);
     const stars = correct ? (save.clues_c.length === chapter.clues_c.length ? 3 : 2) : 1;
     setResult({ checks_c: checks, correct_c: correct, stars_c: stars });
@@ -54,7 +54,8 @@ export default function VerdictScreen() {
   if (save.clues_c.length < 3) return <Navigate to="/clues" replace/>;
 
   return <div className="mx-auto max-w-6xl px-5 py-6 sm:px-8 sm:py-9">
-    <PageHeader back="/clues" title={t('Phán Quyết', 'Verdict')} subtitle={t('Bạn đã điều tra đủ chưa? Hãy đưa ra kết luận.', 'Have you investigated enough? Make your conclusion.')}/>
+    <PageHeader back="/clues" title="Phiên Tòa Tranh Luận" subtitle="Đối chiếu giả thuyết, chọn chứng cứ, tìm mâu thuẫn và xác định giới hạn của kết luận."/>
+    <blockquote className="mb-6 border-l-4 border-primary bg-card p-6 text-base leading-relaxed">{chapter.testimony_c}<p className="mt-3 text-sm text-muted-foreground">An: “Người thực hiện hành động không tự động là chủ mưu. Chúng ta có quyền chất vấn nguồn bằng chứng.”</p></blockquote>
     <ol className="mb-6 flex gap-3 border-b border-border pb-5">
       {['Loại lừa đảo', 'Chứng cứ', 'Hành động'].map((label, i) => <li key={label} className="flex flex-1 items-center gap-2 text-xs"><span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-bold ${steps[i] ? 'border-chart-2 bg-secondary text-accent-foreground' : 'border-border text-muted-foreground'}`}>{steps[i] ? <ApperIcon name="Check" className="h-4 w-4"/> : i + 1}</span><span className="hidden sm:inline">{label}</span></li>)}
     </ol>
@@ -68,7 +69,7 @@ export default function VerdictScreen() {
         </fieldset>
         <fieldset disabled={Boolean(result)} className="panel-cut border border-border bg-card p-5 sm:p-6">
           <legend className="bg-background px-2 font-heading text-2xl font-semibold">02 / Hai chứng cứ quan trọng nhất?</legend>
-          <p className="mb-3 text-xs text-muted-foreground">Chọn hai dấu hiệu trực tiếp vạch trần lời nói dối. Đã chọn {evidence.length}/2.</p>
+          <p className="mb-3 text-xs text-muted-foreground">Chọn hai chứng cứ đối chiếu hành động với nguồn dữ liệu, không chỉ danh tính hiển thị. Đã chọn {evidence.length}/2.</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {chapter.clues_c.map((clue, i) => <button key={i} type="button" disabled={!save.clues_c.includes(i)} onClick={() => toggleEvidence(i)} aria-pressed={evidence.includes(i)}
               className={`game-focus flex min-h-16 items-center gap-3 border p-3 text-left text-xs transition-colors hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-40 ${evidence.includes(i) ? 'border-chart-2 bg-secondary' : 'border-border bg-background'}`}>
@@ -78,7 +79,7 @@ export default function VerdictScreen() {
           </div>
         </fieldset>
         <fieldset disabled={Boolean(result)} className="panel-cut border border-border bg-card p-5 sm:p-6">
-          <legend className="bg-background px-2 font-heading text-2xl font-semibold">03 / Nạn nhân nên làm gì?</legend>
+          <legend className="bg-background px-2 font-heading text-2xl font-semibold">03 / Kết luận nào được chứng cứ hỗ trợ?</legend>
           <div className="space-y-2">{actionOrder.map(index => <button key={index} type="button" onClick={() => setAction(choices[index])} aria-pressed={action === choices[index]} className={`game-focus min-h-12 w-full border px-4 py-3 text-left text-sm leading-relaxed transition-colors hover:bg-secondary ${action === choices[index] ? 'border-chart-2 bg-secondary text-accent-foreground' : 'border-border bg-background'}`}>{choices[index]}</button>)}</div>
         </fieldset>
       </div>
@@ -113,7 +114,7 @@ export default function VerdictScreen() {
             {result && !result.correct_c && <div className="mb-6 border-l-4 border-destructive bg-muted p-4 text-sm leading-relaxed"><b>Cần kiểm tra lại:</b><ul className="mt-2 list-disc space-y-2 pl-5">
               {!result.checks_c[0] && <li>Loại lừa đảo đúng: {chapter.category_c}.</li>}
               {!result.checks_c[1] && <li>Hai chứng cứ then chốt: {chapter.clues_c[0][0]} và {chapter.clues_c[2][0]}.</li>}
-              {!result.checks_c[2] && <li>Hành động an toàn: {chapter.action_c}</li>}
+              {!result.checks_c[2] && <li>Kết luận cần kiểm chứng: {chapter.verdict_c[0]}</li>}
             </ul></div>}
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-5">
@@ -131,7 +132,7 @@ export default function VerdictScreen() {
           </motion.article>
         </div>
         <SheetFooter className="shrink-0 border-t border-border p-6">
-          <Button disabled={!read} onClick={() => { finishChapter(result.stars_c); setDebrief(false); navigate('/chapters'); }} className="mx-auto h-12 w-full max-w-4xl bg-primary font-bold text-primary-foreground hover:bg-primary/90">{save.active_c === CHAPTERS.length - 1 ? 'Hoàn thành hồ sơ · Xem thành tích' : 'Lưu bài học · Chương tiếp theo'}<ApperIcon name="ArrowRight" className="ml-2 h-4 w-4"/></Button>
+          <Button disabled={!read || !result} onClick={() => { finishChapter(result.stars_c, result.correct_c); setDebrief(false); navigate('/aftermath'); }} className="mx-auto h-12 w-full max-w-4xl bg-primary font-bold text-primary-foreground hover:bg-primary/90">Lưu phán quyết · Xem hậu quả<ApperIcon name="ArrowRight" className="ml-2 h-4 w-4"/></Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

@@ -12,7 +12,7 @@ import { PageHeader, shareSafetyCard } from '@/components/nettrap/GameUI';
 export const route = { path: '/codex', layout: 'public', access: 'public' };
 export const nav = { icon: 'Library', label: 'Sổ Tay Lừa Đảo', order: 30, profiles: null };
 
-const ICONS = ['HeartCrack', 'Link', 'TrendingUp', 'BriefcaseBusiness', 'BadgeAlert', 'KeyRound'];
+const ICONS = ['Link', 'BadgeAlert', 'TrendingUp', 'AudioLines', 'BriefcaseBusiness', 'KeyRound', 'ShieldCheck'];
 
 export default function ScamCodex() {
   const { save, totalCompleted, t } = useGame();

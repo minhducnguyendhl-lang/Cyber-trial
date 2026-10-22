@@ -1,8 +1,10 @@
+import { buildCyberChapters, CYBER_CAST } from './cyberPlot';
+
 export const TEXT_SPEEDS = ['Chậm', 'Bình thường', 'Nhanh'];
 export const LANGUAGES = ['Tiếng Việt', 'English'];
 export const DIFFICULTIES = ['Dễ', 'Trung Bình', 'Khó'];
 
-export const CHAPTERS = [
+const SAFETY_CASES = [
   {
     key_c: 'tin-nhan-nua-dem', number_c: '01', title_c: 'Tin nhắn lúc nửa đêm',
     title_en_c: 'Messages at midnight', category_c: 'Lừa đảo tình cảm', short_c: 'Tình cảm',
@@ -167,13 +169,11 @@ export const CHAPTERS = [
   }
 ];
 
-export const CAST = [
-  { key_c: 'an', name_c: 'An', role_c: 'Thám tử', chapter_c: 0, variant_c: 'detective', bio_c: '19 tuổi. Thành viên câu lạc bộ báo chí. Không tin một lời hứa trước khi kiểm tra nguồn.' },
-  { key_c: 'linh', name_c: 'Linh', role_c: 'Nạn nhân', chapter_c: 0, variant_c: 'victim', bio_c: '17 tuổi. Vẽ tranh trong giờ nghỉ. Học cách tìm hỗ trợ mà không tự trách mình.' },
-  { key_c: 'shadow', name_c: 'Ẩn Danh', role_c: 'Kẻ gian', chapter_c: 1, variant_c: 'suspect', bio_c: 'Một khuôn mặt, nhiều vai diễn. Không phải nhân vật nào trên mạng cũng là người họ tự nhận.' }
-];
+export const CHAPTERS = buildCyberChapters(SAFETY_CASES);
+export const CAST = CYBER_CAST;
 
 export function scenesFor(chapter) {
+  if (chapter?.scenes_c) return chapter.scenes_c;
   if (!chapter) return [];
   const question = (index, clue) => ({
     speaker_c: 'An', text_c: chapter.questions_c[index][0],
