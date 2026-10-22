@@ -6,6 +6,7 @@ import { useGame } from '@/components/nettrap/GameState';
 import { CAST, CHAPTERS } from '@/components/nettrap/story';
 import { ENDINGS } from '@/components/nettrap/cyberPlot';
 import SceneArt, { Portrait } from '@/components/nettrap/Art';
+import { characterName, characterText } from '@/components/nettrap/characterImages';
 
 export const route = { path: '/aftermath', layout: 'public', access: 'public' };
 
@@ -59,8 +60,8 @@ export default function Aftermath() {
     </motion.div>
     <div className="relative mx-auto w-full max-w-5xl space-y-6 p-6">
       <article aria-live="polite" className="panel-cut border border-border bg-card/95 p-6 shadow-lg">
-        <h2 className="mb-4 text-lg font-heading font-semibold text-primary">{current.speaker_c}</h2>
-        <p className="text-base leading-relaxed">{current.text_c}</p>
+        <h2 className="mb-4 break-words text-lg font-heading font-semibold text-primary">{characterName(current.speaker_c)}</h2>
+        <p className="text-base leading-relaxed">{characterText(current.text_c)}</p>
       </article>
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
         <p className="text-sm text-muted-foreground">{frame + 1}/{frames.length} · Tiến trình đã lưu{ending ? ' · Hoạt cảnh trong game, không phải video dựng sẵn' : ''}</p>

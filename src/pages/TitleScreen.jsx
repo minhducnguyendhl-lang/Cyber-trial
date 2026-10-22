@@ -30,7 +30,7 @@ export default function TitleScreen() {
         <h1 data-text="CYBER-M" className="title-glitch font-heading text-[clamp(4rem,12vw,9rem)] font-black leading-[.9] tracking-[-.045em]">CYBER<span className="text-primary">-M</span></h1>
         <div className="mt-6 max-w-md border-l-4 border-primary pl-4">
           <p className="font-heading text-3xl font-semibold uppercase sm:text-4xl">Phiên tòa không có nhân chứng</p>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">Mười sinh viên. Bảy chương trong Mê Cung Số. Khi tin nhắn, giọng nói và bằng chứng đều có thể giả mạo, bạn sẽ tin vào điều gì? Điều tra cùng An, chất vấn Cyber-M và tìm đường đưa mọi người trở về.</p>
+          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">Mười sinh viên bị mắc kẹt trong mê cung ảo rộng lớn. Bảy phân khu cách biệt, những hành lang rẽ nhánh và cổng dữ liệu bị khóa. Khi tin nhắn, giọng nói và bằng chứng đều có thể giả mạo, bạn sẽ tin vào điều gì? Điều tra, chất vấn Cyber-M và tìm đường đưa mọi người trở về.</p>
         </div>
         <div className="mt-8 flex max-w-sm flex-col gap-3">
           <Button onClick={begin} className="h-14 rounded-full bg-primary text-base font-extrabold uppercase tracking-wider text-primary-foreground shadow-lg transition-transform hover:scale-[1.02] hover:bg-primary/90"><ApperIcon name="Play" className="mr-2 h-5 w-5 fill-current"/>{t('Bắt Đầu', 'Start')}</Button>

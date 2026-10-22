@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import ApperIcon from "@/components/ApperIcon";
@@ -8,6 +8,10 @@ import { CAST, CHAPTERS } from "@/components/nettrap/story";
 import { useGame } from "@/components/nettrap/GameState";
 import SceneArt, { Portrait } from "@/components/nettrap/Art";
 import { PageHeader, downloadBlob } from "@/components/nettrap/GameUI";
+import { characterName, characterText, getCharacterImage, loadCharacterImages, saveCharacterImage, subscribeCharacterImages } from "@/components/nettrap/characterImages";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const route = { path: '/gallery', layout: 'public', access: 'public' };
 export const nav = { icon: 'Image', label: 'Thư Viện', order: 40, profiles: null };
@@ -21,16 +25,38 @@ export default function Gallery() {
   const imageRef = useRef(null);
   const touchStart = useRef(null);
   const pinchStart = useRef(null);
+  const [target, setTarget] = useState('An');
+  const [importing, setImporting] = useState(false);
+  const [, refreshImages] = useState(0);
+  useEffect(() => {
+    const unsubscribe = subscribeCharacterImages(() => refreshImages(value => value + 1));
+    loadCharacterImages().catch(error => toast.error(`Không thể đọc ảnh đã lưu: ${error.message}`));
+    return unsubscribe;
+  }, []);
+  async function importPortrait(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      await saveCharacterImage(target, file);
+      toast.success(`Đã gắn ảnh và tên ${characterName(target)} vào vai ${target}.`);
+    } catch (error) {
+      toast.error(error.message || 'Không thể lưu ảnh.');
+    } finally {
+      setImporting(false);
+      event.target.value = '';
+    }
+  }
 
   const items = tab === 'characters' ? CAST.map(person => ({
-    key_c: person.key_c, title_c: person.name_c, subtitle_c: person.role_c,
+    key_c: person.key_c, portrait_c: person.name_c, title_c: characterName(person.name_c), subtitle_c: person.role_c,
     description_c: `${person.bio_c} Phương châm: “${person.slogan_c}”`, chapter_c: person.chapter_c, variant_c: person.variant_c
   })) : CHAPTERS.map((chapter, i) => ({
     key_c: chapter.key_c, title_c: chapter.title_c, subtitle_c: `CG / Vụ ${chapter.number_c}`,
     description_c: chapter.hook_c, chapter_c: i, variant_c: i % 2 ? 'suspect' : 'detective',
     scene_c: chapter.scene_c
   }));
-  const unlockedIndices = items.map((item, i) => save.completed_c[item.chapter_c] ? i : null).filter(i => i != null);
+  const unlockedIndices = items.map((item, i) => tab === 'characters' || save.completed_c[item.chapter_c] ? i : null).filter(i => i != null);
   const item = selected == null ? null : items[selected];
   function cycle(direction) {
     const position = unlockedIndices.indexOf(selected);
@@ -40,6 +66,11 @@ export default function Gallery() {
   }
   function downloadArt() {
     try {
+      const original = tab === 'characters' && getCharacterImage(item?.portrait_c);
+      if (original) {
+        downloadBlob(original.file_c, original.file_c.name);
+        return;
+      }
       const svg = imageRef.current?.querySelector('svg');
       if (!svg || !item) return;
       const clone = svg.cloneNode(true);
@@ -74,6 +105,14 @@ downloadBlob(new Blob([new window.XMLSerializer().serializeToString(clone)], { t
       action={<div className="flex border border-border bg-card p-1">
         {[['characters', 'Nhân vật', 'Users'], ['cg', 'CG', 'Image']].map(([key, label, icon]) => <button key={key} type="button" aria-pressed={tab === key} onClick={() => { setTab(key); setSelected(null); }} className={`game-focus flex min-h-11 items-center gap-2 px-4 text-xs font-bold transition-colors hover:bg-secondary ${tab === key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}><ApperIcon name={icon} className="h-4 w-4"/>{label}</button>)}
       </div>}/>
+    {tab === 'characters' && <section className="panel-cut mb-6 space-y-4 border border-border bg-card p-4">
+      <div><h2 className="text-base font-heading font-semibold">Gắn ảnh nhân vật của bạn</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Chọn vai rồi chọn ảnh gốc. Tên tệp (không gồm phần mở rộng) sẽ là tên nhân vật trong hội thoại. Ảnh được lưu trên trình duyệt này, không bị xóa khi chơi lại.</p></div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="min-w-0 space-y-2"><Label htmlFor="character-role">Vai trong cốt truyện</Label><Select value={target} onValueChange={setTarget} disabled={importing}><SelectTrigger id="character-role"><SelectValue/></SelectTrigger><SelectContent>{CAST.map(person => <SelectItem key={person.key_c} value={person.name_c}>{person.name_c} · {person.role_c}</SelectItem>)}</SelectContent></Select></div>
+        <div className="min-w-0 space-y-2"><Label htmlFor="character-image">Ảnh PNG, JPG hoặc WebP · tối đa 15 MB</Label><Input id="character-image" type="file" accept="image/png,image/jpeg,image/webp" disabled={importing} onChange={importPortrait}/></div>
+      </div>
+      <p aria-live="polite" className="text-sm text-muted-foreground">{importing ? 'Đang lưu ảnh…' : getCharacterImage(target) ? `Đã gắn: ${characterName(target)}` : 'Vai này đang dùng minh họa vector hiện có.'}</p>
+    </section>}
     {tab === 'characters' && <Button variant="outline" onClick={() => setRelationships(!relationships)} className="mb-5 h-11 gap-2 border-border text-xs font-semibold hover:bg-secondary"><ApperIcon name="Network" className="h-4 w-4"/>{relationships ? 'Ẩn sơ đồ quan hệ' : 'Xem sơ đồ quan hệ'}</Button>}
     {relationships && tab === 'characters' && <div className="panel-cut mb-6 overflow-x-auto border border-border bg-card p-5">
       <svg viewBox="0 0 750 170" className="min-w-[550px]" role="img" aria-label="An và nhóm sinh viên kiểm chứng bằng chứng do Cyber-M kiểm soát">
@@ -86,10 +125,10 @@ downloadBlob(new Blob([new window.XMLSerializer().serializeToString(clone)], { t
     {!totalCompleted && <div className="panel-cut mb-6 flex flex-wrap items-center gap-4 border border-chart-2/30 bg-secondary p-5"><ApperIcon name="Image" className="h-9 w-9 text-accent-foreground"/><div className="flex-1"><p className="font-heading text-2xl font-semibold">Chơi để mở khóa hình ảnh đặc biệt</p><p className="mt-1 text-xs text-muted-foreground">Hoàn thành vụ án và đọc bài học để nhận tranh nguyên bản.</p></div><Link to="/chapters" className="game-focus flex min-h-11 items-center bg-primary px-5 text-xs font-bold text-primary-foreground hover:bg-primary/90">Chơi ngay</Link></div>}
     <div className="columns-2 gap-4 md:columns-3">
       {items.map((art, i) => {
-        const open = Boolean(save.completed_c[art.chapter_c]);
+        const open = tab === 'characters' || Boolean(save.completed_c[art.chapter_c]);
         return <button key={art.key_c} type="button" disabled={!open} onClick={() => { setSelected(i); setZoom(1); }} className="game-focus panel-cut group relative mb-4 block w-full break-inside-avoid overflow-hidden border border-border bg-card text-left shadow-sm transition-shadow hover:shadow-md disabled:cursor-not-allowed">
           <div className={`relative overflow-hidden ${tab === 'characters' ? 'aspect-[1/1.4]' : i % 2 ? 'aspect-[4/5]' : 'aspect-[4/3]'}`}>
-            {tab === 'characters' ? <Portrait name={art.title_c} variant={art.variant_c} emotion="neutral" className={`h-full w-full bg-secondary transition-transform duration-300 group-hover:scale-[1.03] ${open ? '' : 'opacity-25 blur-md'}`}/> : <SceneArt scene={art.scene_c} variant={art.variant_c} className={`h-full w-full ${open ? '' : 'opacity-25 blur-md'}`} preserveAspectRatio="xMidYMid slice"/>}
+            {tab === 'characters' ? <Portrait name={art.portrait_c} variant={art.variant_c} emotion="neutral" className={`h-full w-full bg-secondary transition-transform duration-300 group-hover:scale-[1.03] ${open ? '' : 'opacity-25 blur-md'}`}/> : <SceneArt scene={art.scene_c} variant={art.variant_c} className={`h-full w-full ${open ? '' : 'opacity-25 blur-md'}`} preserveAspectRatio="xMidYMid slice"/>}
             {!open && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-3 text-center"><ApperIcon name="LockKeyhole" className="h-6 w-6"/><span className="text-[10px] text-muted-foreground">Hoàn thành Vụ {String(art.chapter_c + 1).padStart(2, '0')}</span></div>}
           </div>
           <div className="p-3 sm:p-4"><p className="text-[10px] uppercase tracking-widest text-primary">{art.subtitle_c}</p><h2 className="mt-1 font-heading text-xl font-bold sm:text-2xl">{open ? art.title_c : 'Hình ảnh chưa mở'}</h2>{open && tab === 'characters' && <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{art.description_c}</p>}</div>
@@ -119,10 +158,10 @@ downloadBlob(new Blob([new window.XMLSerializer().serializeToString(clone)], { t
                 touchStart.current = null;
               }}>
               <div style={{ width: `${zoom * 100}%` }}>
-                {tab === 'characters' ? <Portrait name={item.title_c} variant={item.variant_c} className="mx-auto h-[50vh] w-full"/> : <SceneArt scene={item.scene_c} variant={item.variant_c} className="w-full"/>}
+                {tab === 'characters' ? <Portrait name={item.portrait_c} variant={item.variant_c} className="mx-auto h-[50vh] w-full"/> : <SceneArt scene={item.scene_c} variant={item.variant_c} className="w-full"/>}
               </div>
             </div>
-            <details open className="mt-4 border-t border-border pt-4"><summary className="game-focus cursor-pointer font-heading text-xl font-semibold">Hồ sơ nhân vật và minh họa</summary><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description_c}</p><p className="mt-2 text-xs text-muted-foreground">Minh họa vector hiện có; chưa phải hình từ ZIP nhân vật. Nhân vật và tình huống đều hư cấu.</p></details>
+            <details open className="mt-4 border-t border-border pt-4"><summary className="game-focus cursor-pointer font-heading text-xl font-semibold">Hồ sơ nhân vật và minh họa</summary><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{characterText(item.description_c)}</p><p className="mt-2 text-xs text-muted-foreground">{getCharacterImage(item.portrait_c) ? 'Ảnh gốc do bạn gắn; tên nhân vật lấy từ tên tệp.' : 'Minh họa vector hiện có. Gắn ảnh gốc để thay chân dung.'} Nhân vật và tình huống đều hư cấu.</p></details>
           </div>}
         </div>
         <DialogFooter className="shrink-0 flex-wrap gap-2 border-t border-border p-6">

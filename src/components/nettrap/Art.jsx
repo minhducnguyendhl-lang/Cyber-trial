@@ -1,12 +1,21 @@
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { getCharacterImage, loadCharacterImages, subscribeCharacterImages } from './characterImages';
 
 export function Portrait({ name, variant = 'detective', emotion = 'neutral', className = '', ...props }) {
   const id = useId().replace(/:/g, '');
+  const [, refresh] = useState(0);
+  useEffect(() => {
+    const unsubscribe = subscribeCharacterImages(() => refresh(value => value + 1));
+    loadCharacterImages().catch(() => {});
+    return unsubscribe;
+  }, []);
+  const image = getCharacterImage(name || (variant === 'detective' ? 'An' : 'Cyber-M'));
   const suspect = variant === 'suspect';
   const victim = variant === 'victim';
   const shocked = emotion === 'shocked' || emotion === 'scared';
   const angry = emotion === 'angry' || emotion === 'suspicious';
   const happy = emotion === 'happy';
+  if (image) return <svg viewBox="0 0 480 680" className={className} role="img" aria-label={`Chân dung ${image.name_c}`} {...props}><image href={image.url_c} width="480" height="680" preserveAspectRatio="xMidYMid meet"/></svg>;
   return <svg viewBox="0 0 480 680" className={className} role="img" aria-label={name ? `Minh họa vector tạm dùng cho ${name}` : suspect ? 'Chân dung kẻ ẩn danh' : victim ? 'Nhân vật trong vụ án' : 'An, thám tử trẻ'} {...props}>
     <defs>
       <linearGradient id={`coat-${id}`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="var(--muted)"/><stop offset="1" stopColor="var(--background)"/></linearGradient>
@@ -48,10 +57,11 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', cla
   </svg>;
 }
 
-export default function SceneArt({ scene = 'city', variant = 'detective', emotion = 'suspicious', portrait = true, className = '', ...props }) {
+export default function SceneArt({ scene = 'maze-hub', variant = 'detective', emotion = 'suspicious', portrait = true, className = '', ...props }) {
   const id = useId().replace(/:/g, '');
   const digital = scene === 'digital';
-  return <svg viewBox="0 0 1000 650" className={className} role="img" aria-label="Minh họa manga: thám tử trước thành phố và những dấu vết lừa đảo" {...props}>
+  const zone = { 'maze-school': '01 / HỌC BỔNG', 'maze-bank': '02 / NGÂN HÀNG', 'maze-market': '03 / GIAO DỊCH', 'maze-residence': '04 / KÝ TÚC XÁ', 'maze-office': '05 / TUYỂN DỤNG', 'maze-archive': '06 / KHO LƯU TRỮ', 'maze-hub': '07 / TRUNG TÂM' }[scene] || 'TRUNG TÂM';
+  return <svg viewBox="0 0 1000 650" className={className} role="img" aria-label={`Mê cung ảo rộng lớn, các phân khu cách biệt: ${zone}`} {...props}>
     <defs>
       <linearGradient id={`sky-${id}`} x2="0" y2="1"><stop stopColor="var(--secondary)"/><stop offset="1" stopColor="var(--background)"/></linearGradient>
       <radialGradient id={`halo-${id}`}><stop stopColor="var(--chart-2)" stopOpacity=".35"/><stop offset="1" stopColor="var(--chart-2)" stopOpacity="0"/></radialGradient>
@@ -82,6 +92,27 @@ export default function SceneArt({ scene = 'city', variant = 'detective', emotio
     </g>
     <path d="M0 649 1000 537v113H0" fill="var(--background)" opacity=".9"/>
     <rect width="1000" height="650" fill={`url(#dots-${id})`}/>
+    <g stroke="var(--chart-2)" strokeWidth="2">
+      <path d="M0 0H1000V650H0Z" fill="var(--background)"/>
+      <path d="M0 650 390 370H610L1000 650ZM0 0 390 200V370L0 650ZM1000 0 610 200V370L1000 650Z" fill="var(--secondary)"/>
+      <path d="M390 200H610V370H390Z" fill="var(--background)"/>
+      {[0, 1, 2, 3].map(i => <g key={i} opacity={1 - i * .18}>
+        <path d={`M${70 + i * 88} ${36 + i * 45}V${600 - i * 62}M${930 - i * 88} ${36 + i * 45}V${600 - i * 62}`} strokeWidth="8"/>
+        <path d={`M${70 + i * 88} ${36 + i * 45}H${930 - i * 88}`} stroke="var(--border)" strokeWidth="12"/>
+      </g>)}
+      <path d="M30 190 120 230V475L30 530ZM880 230 970 190V530L880 475Z" fill="var(--muted)" stroke="var(--primary)" strokeWidth="4"/>
+      <path d="M440 240H560V370H440Z" fill="var(--muted)" stroke="var(--primary)" strokeWidth="4"/>
+      <path d="M500 240V370M30 350 120 335M880 335 970 350" stroke="var(--primary)"/>
+      <path d="M65 650 412 370M935 650 588 370M0 555H1000M170 460H830M295 410H705" opacity=".45"/>
+      <path d="M0 90 390 240M1000 90 610 240" strokeWidth="5"/>
+      <g transform="translate(735 38)" fill="var(--background)">
+        <rect width="230" height="148" rx="4" stroke="var(--border)"/>
+        <path d="M18 42h48v35H38v43h55V61h42v59h30V42h46M18 91h20M93 120v13h118M135 61V30h30M66 42V25h45" fill="none" strokeWidth="5"/>
+        <text x="18" y="20" fill="var(--chart-2)" stroke="none" fontSize="11" fontFamily="monospace">RÉSEAU / SECTEURS ISOLÉS</text>
+      </g>
+      <text x="500" y="220" textAnchor="middle" fill="var(--chart-2)" stroke="none" fontSize="14" fontFamily="monospace">{zone}</text>
+      <text x="500" y="292" textAnchor="middle" fill="var(--primary)" stroke="none" fontSize="12" fontFamily="monospace">ACCÈS VERROUILLÉ</text>
+    </g>
     {portrait && <Portrait x="448" y="14" width="505" height="715" variant={variant} emotion={emotion}/>}
     <g stroke="var(--foreground)" opacity=".16" strokeWidth="2"><path d="M988 21 930 127M957 25 904 125M1000 446 942 468M15 585 134 553M25 610 144 568"/></g>
   </svg>;

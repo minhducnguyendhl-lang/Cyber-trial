@@ -20,8 +20,9 @@ export const CYBER_CAST = [
 const PROLOGUE = [
   line('An', 'Tiếng kính vỡ. Một giọng nói quen thuộc. Rồi trắng xóa. Tôi tỉnh dậy trên sàn phòng trắng, cổ tay bị khóa bởi chiếc vòng điện tử. Màn hình chỉ còn một câu: ĐỪNG TIN VÀO NHỮNG GÌ CẬU NHỚ.', 'scared'),
   line('Mai', 'Có ai nghe thấy không? Cửa không mở! Xin đừng chen nhau… Mọi người có bị thương không?', 'scared'),
-  line('An', 'Chín sinh viên xa lạ đứng quanh tôi. Thành phố ngoài cửa kính có trường học, ngân hàng, ký túc xá… nhưng không có một người qua đường. Tôi không nhớ vì sao mình đến đây.', 'shocked'),
+  line('An', 'Chín sinh viên xa lạ đứng quanh tôi. Ngoài cửa kính không phải một thành phố, mà là mê cung ảo rộng đến mức không thấy điểm cuối. Những hành lang rẽ nhánh nối các khu học bổng, ngân hàng, ký túc xá và kho lưu trữ; giữa chúng là tường dữ liệu và cửa cách ly. Tôi không nhớ vì sao mình đến đây.', 'shocked'),
   line('Cyber-M', 'Chào mừng đến với Mê Cung Số. Không được sống dưới danh tính giả, không được xóa dấu vết, không được rời đi trước khi sự thật được phán quyết.'),
+  line('Cyber-M', 'Mỗi phân khu là một không gian tách biệt. Các cổng dữ liệu chỉ mở theo quyền truy cập của ta. Đừng nhầm một hành lang sáng đèn với đường thoát: sau nó có thể là một ngõ cụt, hoặc một khu vực đã bị phong tỏa.'),
   line('Cyber-M', 'Mỗi chương có một sự cố. Điều tra, thu thập bằng chứng số và tham gia Phiên Tòa Tranh Luận. Phán quyết sai sẽ làm lộ một phần hồ sơ cá nhân và tăng đe dọa trong mô phỏng. Người bị kết luận có lỗi sẽ bị thu hồi vào Kho Lưu Trữ. Sau bảy chương, người sống sót có cơ hội trở về.'),
   line('Cyber-M', 'Ta đã đọc toàn bộ hồ sơ của các ngươi. Ta biết ai sẽ hoảng loạn, ai sẽ phản bội. Đặc biệt là cậu, An. Thiên tài của chúng ta sẽ phá bao nhiêu vụ án trước khi trở thành nạn nhân của chính suy luận mình?'),
   line('Trâm', '“Thu hồi” là gì? Xóa danh tính… hay xóa cả chúng ta? Đừng ép ai trả lời khi họ đang hoảng loạn.', 'scared'),
@@ -156,6 +157,8 @@ export function buildCyberChapters(safety) {
     }));
     return {
       ...base, ...plot, key_c: `cyber-${i + 1}`, number_c: String(i + 1).padStart(2, '0'),
+      setting_c: `Mê Cung Số · Khu ${String(i + 1).padStart(2, '0')} · ${plot.setting_c}`,
+      scene_c: ['maze-school', 'maze-bank', 'maze-market', 'maze-residence', 'maze-office', 'maze-archive', 'maze-hub'][i],
       title_en_c: plot.title_c, short_c: plot.category_c, difficulty_c: i < 2 ? 'Dễ' : i < 5 ? 'Trung Bình' : 'Khó',
       intro_c: plot.incident_c.map(n => n.text_c).join(' '),
       twist_c: plot.aftermath_c.at(-1).text_c,
