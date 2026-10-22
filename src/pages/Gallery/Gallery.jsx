@@ -28,6 +28,7 @@ export default function Gallery() {
   const [target, setTarget] = useState('An');
   const [importing, setImporting] = useState(false);
   const [, refreshImages] = useState(0);
+  const allPortraitsAssigned = CAST.every(person => Boolean(getCharacterImage(person.name_c)));
   useEffect(() => {
     const unsubscribe = subscribeCharacterImages(() => refreshImages(value => value + 1));
     loadCharacterImages().catch(error => toast.error(`Không thể đọc ảnh đã lưu: ${error.message}`));
@@ -105,7 +106,7 @@ downloadBlob(new Blob([new window.XMLSerializer().serializeToString(clone)], { t
       action={<div className="flex border border-border bg-card p-1">
         {[['characters', 'Nhân vật', 'Users'], ['cg', 'CG', 'Image']].map(([key, label, icon]) => <button key={key} type="button" aria-pressed={tab === key} onClick={() => { setTab(key); setSelected(null); }} className={`game-focus flex min-h-11 items-center gap-2 px-4 text-xs font-bold transition-colors hover:bg-secondary ${tab === key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}><ApperIcon name={icon} className="h-4 w-4"/>{label}</button>)}
       </div>}/>
-    {tab === 'characters' && <section className="panel-cut mb-6 space-y-4 border border-border bg-card p-4">
+    {tab === 'characters' && !allPortraitsAssigned && <section className="panel-cut mb-6 space-y-4 border border-border bg-card p-4">
       <div><h2 className="text-base font-heading font-semibold">Gắn ảnh nhân vật của bạn</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Chọn vai rồi chọn ảnh gốc. Tên tệp (không gồm phần mở rộng) sẽ là tên nhân vật trong hội thoại. Ảnh được lưu trên trình duyệt này, không bị xóa khi chơi lại.</p></div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="min-w-0 space-y-2"><Label htmlFor="character-role">Vai trong cốt truyện</Label><Select value={target} onValueChange={setTarget} disabled={importing}><SelectTrigger id="character-role"><SelectValue/></SelectTrigger><SelectContent>{CAST.map(person => <SelectItem key={person.key_c} value={person.name_c}>{person.name_c} · {person.role_c}</SelectItem>)}</SelectContent></Select></div>
@@ -161,7 +162,7 @@ downloadBlob(new Blob([new window.XMLSerializer().serializeToString(clone)], { t
                 {tab === 'characters' ? <Portrait name={item.portrait_c} variant={item.variant_c} className="mx-auto h-[50vh] w-full"/> : <SceneArt scene={item.scene_c} variant={item.variant_c} className="w-full"/>}
               </div>
             </div>
-            <details open className="mt-4 border-t border-border pt-4"><summary className="game-focus cursor-pointer font-heading text-xl font-semibold">Hồ sơ nhân vật và minh họa</summary><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{characterText(item.description_c)}</p><p className="mt-2 text-xs text-muted-foreground">{getCharacterImage(item.portrait_c) ? 'Ảnh gốc do bạn gắn; tên nhân vật lấy từ tên tệp.' : 'Minh họa vector hiện có. Gắn ảnh gốc để thay chân dung.'} Nhân vật và tình huống đều hư cấu.</p></details>
+            <details open className="mt-4 border-t border-border pt-4"><summary className="game-focus cursor-pointer font-heading text-xl font-semibold">Hồ sơ nhân vật và minh họa</summary><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{characterText(item.description_c)}</p><p className="mt-2 text-xs text-muted-foreground">{getCharacterImage(item.portrait_c) ? 'Chân dung nhân vật.' : 'Minh họa vector hiện có.'} Nhân vật và tình huống đều hư cấu.</p></details>
           </div>}
         </div>
         <DialogFooter className="shrink-0 flex-wrap gap-2 border-t border-border p-6">
