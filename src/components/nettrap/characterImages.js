@@ -1,7 +1,51 @@
+import { toast } from 'sonner';
+
 const databaseName = 'cyber-m-character-art';
 const listeners = new Set();
 const images = new Map();
 let loading;
+let backgroundRemover;
+
+async function cutout(file) {
+  backgroundRemover ??= import('@imgly/background-removal');
+  const { removeBackground } = await backgroundRemover;
+  return removeBackground(file);
+}
+
+async function storePortrait(row) {
+  const db = await openDatabase();
+  try {
+    await new Promise((resolve, reject) => {
+      const transaction = db.transaction('portraits', 'readwrite');
+      transaction.objectStore('portraits').put(row);
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
+    });
+  } finally { db.close(); }
+}
+
+async function preparePortraits(rows) {
+  const pending = rows.filter(row => !row.cutout_c);
+  if (!pending.length) return;
+  const notification = toast.loading('Đang tách nền chân dung… Lần đầu cần tải mô hình xử lý ảnh.');
+  let failed = 0;
+  for (const row of pending) {
+    try {
+      const prepared = { ...row, file_c: await cutout(row.file_c), cutout_c: true };
+      await storePortrait(prepared);
+      const previous = images.get(row.key_c);
+      images.set(row.key_c, { ...prepared, url_c: URL.createObjectURL(prepared.file_c) });
+      if (previous) URL.revokeObjectURL(previous.url_c);
+      listeners.forEach(listener => listener());
+    } catch {
+      failed += 1;
+    }
+  }
+  toast.dismiss(notification);
+  if (failed) toast.error(`Chưa tách được nền ${failed} chân dung. Ảnh gốc được giữ nguyên; tải lại khi có kết nối để thử lại.`);
+  else toast.success('Đã tách nền và lưu các chân dung trên thiết bị này.');
+}
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -20,6 +64,7 @@ export function loadCharacterImages() {
       db.close();
       listeners.forEach(listener => listener());
       resolve();
+      void preparePortraits(request.result);
     };
     request.onerror = () => { db.close(); reject(request.error); };
   }));
@@ -44,18 +89,13 @@ export async function saveCharacterImage(key, file) {
       image.src = url;
     });
     await loadCharacterImages();
-    const row = { key_c: key, name_c: file.name.replace(/\.[^.]+$/, ''), file_c: file };
-    const db = await openDatabase();
-    await new Promise((resolve, reject) => {
-      const transaction = db.transaction('portraits', 'readwrite');
-      transaction.objectStore('portraits').put(row);
-      transaction.oncomplete = resolve;
-      transaction.onerror = () => reject(transaction.error);
-      transaction.onabort = () => reject(transaction.error);
-    }).finally(() => db.close());
+    const prepared = await cutout(file);
+    const row = { key_c: key, name_c: file.name.replace(/\.[^.]+$/, ''), file_c: prepared, cutout_c: true };
+    await storePortrait(row);
     const previous = images.get(key);
     if (previous) URL.revokeObjectURL(previous.url_c);
-    images.set(key, { ...row, url_c: url });
+    images.set(key, { ...row, url_c: URL.createObjectURL(prepared) });
+    URL.revokeObjectURL(url);
     listeners.forEach(listener => listener());
   } catch (error) {
     URL.revokeObjectURL(url);

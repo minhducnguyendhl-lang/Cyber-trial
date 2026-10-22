@@ -100,15 +100,15 @@ export default function VisualNovelScene() {
         <Button variant="ghost" onClick={() => setMenuOpen(true)} aria-label="Menu cảnh" className="h-11 w-11 p-0 hover:bg-muted"><ApperIcon name="Menu" className="h-5 w-5"/></Button>
       </div>
     </div>
-    <div className="pointer-events-none relative mx-auto h-[35vh] min-h-52 max-w-5xl sm:h-[44vh] sm:min-h-72">
-      <Portrait name="An" variant="detective" emotion={node.speaker_c === 'An' ? node.emotion_c : 'suspicious'} className={`absolute bottom-[-12vh] left-[-8%] h-[58vh] min-h-80 w-[65%] transition-opacity duration-150 sm:left-0 sm:h-[68vh] sm:w-[50%] ${node.speaker_c === 'An' ? 'opacity-100' : 'opacity-40'}`}/>
-      <Portrait name={node.speaker_c === 'An' ? chapter.victim_c.split(' · ')[0] : node.speaker_c} variant={CAST.find(p => p.name_c === node.speaker_c)?.variant_c || 'suspect'} emotion={node.emotion_c} className={`absolute bottom-[-12vh] right-[-9%] h-[57vh] min-h-80 w-[65%] transition-opacity duration-150 sm:right-0 sm:h-[66vh] sm:w-[50%] ${node.speaker_c === 'An' ? 'opacity-40' : 'opacity-100'}`}/>
+    <div className="pointer-events-none relative mx-auto h-[35vh] min-h-52 max-w-5xl overflow-hidden sm:h-[44vh] sm:min-h-72">
+      <Portrait name="An" framing="bust" variant="detective" emotion={node.speaker_c === 'An' ? node.emotion_c : 'suspicious'} className={`absolute bottom-0 left-0 h-full w-[52%] transition-opacity duration-(--transition-fast) ${node.speaker_c === 'An' ? 'opacity-100' : 'opacity-40'}`}/>
+      {node.speaker_c !== 'An' && <Portrait name={node.speaker_c} framing="bust" variant={CAST.find(p => p.name_c === node.speaker_c)?.variant_c || 'suspect'} emotion={node.emotion_c} className="absolute bottom-0 right-0 h-full w-[52%] opacity-100"/>}
     </div>
     <section className="relative z-20 mx-auto max-w-5xl px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
       <div className="panel-cut min-h-60 border border-border bg-background/95 p-5 shadow-lg sm:p-7">
         <div className="mb-4 flex items-center justify-between gap-3">
           <span className="panel-cut min-w-0 break-words bg-primary px-5 py-1 font-heading text-xl font-bold text-primary-foreground">{characterName(node.speaker_c)}</span>
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">{node.investigation_c != null ? 'Khám nghiệm chứng cứ' : 'Đối thoại'}</span>
+          <span className="shrink-0 text-xs text-muted-foreground">{node.warning_c && node.speaker_c === 'Cyber-M' ? 'Thông báo sự cố' : node.investigation_c != null ? 'Khám nghiệm chứng cứ' : ({ happy: 'Vui mừng', scared: 'Sợ hãi', shocked: 'Hoang mang', confused: 'Hoang mang', determined: 'Kiên cường' }[node.emotion_c] || 'Đối thoại')}</span>
         </div>
         <button type="button" onClick={next} className="game-focus block min-h-20 w-full whitespace-pre-wrap break-words text-left text-base leading-[1.9] sm:text-lg" aria-label={visible < text.length ? 'Hiện toàn bộ hội thoại' : 'Đọc tiếp hội thoại'}>
           {response ? characterText(response) : text.slice(0, visible)}

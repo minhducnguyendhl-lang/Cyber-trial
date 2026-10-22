@@ -1,7 +1,18 @@
 import { useEffect, useId, useState } from 'react';
 import { getCharacterImage, loadCharacterImages, subscribeCharacterImages } from './characterImages';
 
-export function Portrait({ name, variant = 'detective', emotion = 'neutral', className = '', ...props }) {
+const emotionLabels = { neutral: 'bình tĩnh', happy: 'vui mừng', scared: 'sợ hãi', shocked: 'hoang mang', confused: 'hoang mang', determined: 'kiên cường', suspicious: 'suy tư', angry: 'giận dữ' };
+
+function EmotionMarks({ emotion }) {
+  return <g aria-hidden="true" fill="none" strokeWidth="4" strokeLinecap="round">
+    {emotion === 'happy' && <g stroke="var(--warning)"><path d="M90 150v28m-14-14h28M377 90v32m-16-16h32M358 189l12 14 12-14"/><path d="M105 285l16 7m-13 6 16 7M348 285l-16 7m13 6-16 7" stroke="var(--primary)"/></g>}
+    {emotion === 'scared' && <g stroke="var(--chart-2)"><path d="M352 211q-18 25 0 25q18 0 0-25Z" fill="var(--chart-2)" fillOpacity=".5"/><path d="M165 201v25m10-25v20m10-20v16M96 280l-8 10 8 10-8 10M369 280l8 10-8 10 8 10"/></g>}
+    {(emotion === 'confused' || emotion === 'shocked') && <g stroke="var(--warning)"><path d="M347 139q0-24 19-24t19 20q0 12-19 20v13m0 15v2M111 176v-32m0 46v2"/></g>}
+    {emotion === 'determined' && <g stroke="var(--primary)"><path d="M77 255l38-10M80 275l33-6M364 245l38 10M366 269l33 6"/></g>}
+  </g>;
+}
+
+export function Portrait({ name, variant = 'detective', emotion = 'neutral', framing = 'full', className = '', ...props }) {
   const id = useId().replace(/:/g, '');
   const [, refresh] = useState(0);
   useEffect(() => {
@@ -12,11 +23,20 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', cla
   const image = getCharacterImage(name || (variant === 'detective' ? 'An' : 'Cyber-M'));
   const suspect = variant === 'suspect';
   const victim = variant === 'victim';
-  const shocked = emotion === 'shocked' || emotion === 'scared';
-  const angry = emotion === 'angry' || emotion === 'suspicious';
+  const shocked = ['shocked', 'scared', 'confused'].includes(emotion);
+  const angry = ['angry', 'suspicious', 'determined'].includes(emotion);
   const happy = emotion === 'happy';
-  if (image) return <svg viewBox="0 0 480 680" className={className} role="img" aria-label={`Chân dung ${image.name_c}`} {...props}><image href={image.url_c} width="480" height="680" preserveAspectRatio="xMidYMid meet"/></svg>;
-  return <svg viewBox="0 0 480 680" className={className} role="img" aria-label={name ? `Minh họa vector tạm dùng cho ${name}` : suspect ? 'Chân dung kẻ ẩn danh' : victim ? 'Nhân vật trong vụ án' : 'An, thám tử trẻ'} {...props}>
+  const viewBox = framing === 'bust' ? '60 30 360 470' : '0 0 480 680';
+  const label = `${name || 'An'} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
+  if (image) return <svg viewBox={viewBox} className={className} role="img" aria-label={label} {...props}><image href={image.url_c} width="480" height="680" preserveAspectRatio="xMidYMin meet"/><EmotionMarks emotion={emotion}/></svg>;
+  if (name === 'Cyber-M') return <svg viewBox={viewBox} className={className} role="img" aria-label={label} {...props}>
+    <path d="M54 680 80 421 159 368Q100 182 166 94Q234 20 316 96Q378 189 322 368L403 421 435 680Z" fill="var(--background)" stroke="var(--chart-2)" strokeWidth="3"/>
+    <path d="M169 177Q240 133 310 177L293 316 241 356 188 316Z" fill="var(--secondary)"/>
+    {Array.from({ length: 24 }, (_, i) => <rect key={i} x={176 + (i % 6) * 22} y={185 + Math.floor(i / 6) * 28} width="17" height="19" fill={i % 3 ? 'var(--muted)' : 'var(--chart-2)'} opacity={i % 2 ? '.4' : '.8'}/>)}
+    <path d="M190 236h30m40 0h30M209 301h63M168 403l72 81 76-81M240 484v196" fill="none" stroke="var(--primary)" strokeWidth="6"/>
+    <EmotionMarks emotion={emotion}/>
+  </svg>;
+  return <svg viewBox={viewBox} className={className} role="img" aria-label={label} {...props}>
     <defs>
       <linearGradient id={`coat-${id}`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="var(--muted)"/><stop offset="1" stopColor="var(--background)"/></linearGradient>
       <linearGradient id={`face-${id}`}><stop stopColor="var(--card-foreground)"/><stop offset=".7" stopColor="var(--foreground)"/><stop offset="1" stopColor="var(--accent)"/></linearGradient>
@@ -44,7 +64,7 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', cla
       <ellipse cx="286" cy="246" rx={shocked ? 6 : 8} ry={shocked ? 11 : 9} fill={suspect ? 'var(--primary)' : 'var(--chart-2)'}/>
       <circle cx="192" cy="242" r="3" fill="var(--card)"/><circle cx="288" cy="242" r="3" fill="var(--card)"/>
       <path d="M237 250 226 292 241 299" fill="none" stroke="var(--muted-foreground)" strokeWidth="2"/>
-      <path d={happy ? 'M215 321Q242 343 264 315' : shocked ? 'M233 319Q248 307 252 331Q242 346 233 319Z' : 'M217 326Q241 322 260 325'} fill={shocked ? 'var(--background)' : 'none'} stroke="var(--background)" strokeWidth="3"/>
+      <path d={happy ? 'M215 321Q242 343 264 315' : shocked ? 'M233 319Q248 307 252 331Q242 346 233 319Z' : emotion === 'determined' ? 'M215 326h47' : 'M217 326Q241 322 260 325'} fill={shocked ? 'var(--background)' : 'none'} stroke="var(--background)" strokeWidth="3"/>
       <path d="M171 288 184 292M296 287 311 280" fill="none" stroke="var(--primary)" opacity=".3"/>
       {suspect && <g><path d="M132 220 209 218 219 264 141 263ZM259 218 337 220 329 263 250 264Z" fill="var(--background)" fillOpacity=".87" stroke="var(--primary)" strokeWidth="2"/><path d="M215 234h38" stroke="var(--primary)" strokeWidth="4"/><path d="M141 249 196 227M267 249 322 226" stroke="var(--primary)" opacity=".6"/></g>}
       {!suspect && !victim && <g><path d="M133 407 93 461 117 470 155 420" fill="var(--primary)"/><path d="M90 453 62 428 75 472 109 491" fill="var(--primary)"/><path d="M128 261 141 303" stroke="var(--primary)" strokeWidth="3"/></g>}
@@ -54,6 +74,7 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', cla
       <path d="M300 613 351 599 380 680h-82Z" fill="var(--muted)" stroke="var(--border)" strokeWidth="3"/>
       <path d="M151 342 205 374M323 308 278 358" stroke="var(--muted-foreground)" opacity=".35"/>
     </g>
+    <EmotionMarks emotion={emotion}/>
   </svg>;
 }
 
