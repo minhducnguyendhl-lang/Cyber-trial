@@ -1,0 +1,60 @@
+.panel-cut {
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.game-focus:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+.game-grid {
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.title-glitch { position: relative; animation: nettrap-glitch 3s infinite; }
+.title-glitch::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  color: var(--chart-2);
+  clip-path: inset(46% 0 43% 0);
+  transform: translateX(4px);
+  opacity: .65;
+}
+@keyframes nettrap-glitch {
+  0%, 94%, 100% { transform: translateX(0); }
+  95% { transform: translateX(-3px); }
+  96% { transform: translateX(3px); }
+  97% { transform: translateX(0); }
+}
+.hook-fall { animation: hook-fall 18s linear infinite; }
+@keyframes hook-fall { from { transform: translateY(-80px) rotate(-12deg); } to { transform: translateY(800px) rotate(25deg); } }
+.news-scroll { animation: news-scroll 25s linear infinite; white-space: nowrap; }
+@keyframes news-scroll { from { transform: translateX(25%); } to { transform: translateX(-100%); } }
+.flag-pulse { animation: flag-pulse 2s ease-in-out infinite; }
+@keyframes flag-pulse { 50% { opacity: .25; } }
+.unlock-flash { animation: unlock-flash .6s ease-out; }
+@keyframes unlock-flash {
+  0% { box-shadow: inset 0 0 0 3px var(--primary); }
+  50% { box-shadow: inset 0 0 0 3px var(--chart-2); }
+  100% { box-shadow: inset 0 0 0 1px var(--border); }
+}
+.evidence-flip { perspective: 1000px; }
+.evidence-flip-inner { transform-style: preserve-3d; transition: transform var(--transition-slow); }
+.evidence-flip-inner.flipped { transform: rotateY(180deg); }
+.evidence-face { backface-visibility: hidden; }
+.evidence-back { transform: rotateY(180deg); }
+.string-reveal { stroke-dasharray: 900; stroke-dashoffset: 900; animation: string-reveal .5s forwards; }
+@keyframes string-reveal { to { stroke-dashoffset: 0; } }
+.portrait-line { vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.game-range { accent-color: var(--primary); }
+.print-only { display: none; }
+@media print {
+  body * { visibility: hidden; }
+  .print-only, .print-only * { visibility: visible; }
+  .print-only { display: block; position: absolute; inset: 0; padding: 24px; background: var(--card); color: var(--card-foreground); }
+  .print-only article { break-inside: avoid; margin-bottom: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-glitch, .hook-fall, .news-scroll, .flag-pulse, .unlock-flash, .string-reveal { animation: none !important; }
+  .title-glitch::after { display: none; }
+  .evidence-flip-inner { transition: none; }
+  .string-reveal { stroke-dashoffset: 0; }
+}
