@@ -46,7 +46,7 @@ export default function Aftermath() {
   if (!save.has_session_c) return <Navigate to="/chapters" replace/>;
   return <section className="relative isolate flex min-h-[calc(100dvh-3.5rem)] flex-col justify-between overflow-hidden bg-background">
     <div className="pointer-events-none absolute inset-0 -z-10">
-      <SceneArt scene={ending ? film.scene_c : chapter.scene_c} portrait={false} className="h-full w-full" preserveAspectRatio="xMidYMid slice"/>
+      <SceneArt scene={ending ? film.scene_c : current.scene_c || chapter.scene_c} portrait={false} className="h-full w-full" preserveAspectRatio="xMidYMid slice"/>
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/30"/>
     </div>
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-background/90 p-6">

@@ -13,6 +13,15 @@ function Frame({ scene, label, className = '', children, ...props }) {
     <circle cx="690" cy="260" r="430" fill={`url(#glow-${id})`}/>
     <path d="M0 427 390 325H610L1000 427V650H0Z" fill={`url(#floor-${id})`}/>
     <path d="M0 650 390 325M1000 650 610 325M0 503H1000M0 564H1000M118 650 432 325M882 650 568 325" fill="none" stroke="var(--border)" strokeWidth="2" opacity=".38"/>
+    <path d="M0 476H1000M0 488H1000" stroke="var(--chart-2)" strokeWidth="3" opacity=".22"/>
+    <g opacity=".78" pointerEvents="none">
+      <rect x="38" y="48" width="180" height="42" rx="4" fill="var(--background)" stroke="var(--chart-2)" strokeWidth="2"/>
+      <text x="52" y="75" fill="var(--primary)" fontSize="13" fontFamily="monospace">{scene.toUpperCase()} · LIVE</text>
+      <rect x="850" y="500" width="110" height="88" rx="4" fill="var(--muted)" stroke="var(--border)" strokeWidth="3"/>
+      <rect x="862" y="510" width="86" height="46" fill="var(--background)" stroke="var(--chart-2)" strokeWidth="2"/>
+      <path d="M870 540h16l8-19 9 27 9-14h28" fill="none" stroke="var(--primary)" strokeWidth="2"/>
+      <path d="M18 602h250m-250 12h140m380-14h230" stroke="var(--primary)" strokeWidth="3" opacity=".45"/>
+    </g>
     {children}
     <rect width="1000" height="650" fill={`url(#grid-${id})`} pointerEvents="none"/>
     <g fill="none" stroke="var(--chart-2)" strokeWidth="3" opacity=".72" pointerEvents="none">

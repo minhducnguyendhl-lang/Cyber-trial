@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CHAPTERS } from '@/components/nettrap/story';
+import SceneArt from '@/components/nettrap/Art';
 import { useGame } from '@/components/nettrap/GameState';
 
 export default function TrialPanel() {
@@ -48,7 +49,8 @@ export default function TrialPanel() {
     } else finishChapter();
     navigate('/aftermath');
   }
-  return <main className="mx-auto max-w-4xl space-y-5 px-4 py-8 sm:px-8">
+  return <main className="relative isolate mx-auto min-h-[calc(100dvh-3.5rem)] max-w-4xl space-y-5 px-4 py-8 sm:px-8">
+    <div className="pointer-events-none fixed inset-0 -z-10 opacity-25"><SceneArt scene="court" className="h-full w-full"/></div>
     <p className="text-xs font-bold uppercase tracking-widest text-primary">PHIÊN TÒA · VỤ {chapter.number_c}</p>
     <h1 className="font-heading text-4xl font-bold">{beatLabels.join(' → ')}</h1>
     <nav aria-label="Các giai đoạn" className="grid gap-2" style={{ gridTemplateColumns: `repeat(${beatLabels.length}, minmax(0, 1fr))` }}>{beatLabels.map((label, index) => <div key={`${label}-${index}`} className={`border p-2 text-center text-xs ${index === beat ? 'border-primary bg-secondary text-primary' : 'border-border text-muted-foreground'}`}>{label}</div>)}</nav>
