@@ -7,7 +7,7 @@ const builtInImages = {
   'An': { key_c: 'An', name_c: 'An', url_c: '/characters/an.png', built_in_c: true },
   'Bảo Linh': { key_c: 'Bảo Linh', name_c: 'Bảo Linh', url_c: '/characters/Bảo Linh.png', built_in_c: true },
   'Phúc': { key_c: 'Phúc', name_c: 'Phúc', url_c: '/characters/Phúc.png', built_in_c: true },
-  ' Đức': { key_c: ' Đức', name_c: ' Đức', url_c: '/characters/Đức.png', built_in_c: true },
+  'Đức': { key_c: ' Đức', name_c: ' Đức', url_c: '/characters/Đức.png', built_in_c: true },
   'Hạ Vy': { key_c: 'Hạ Vy', name_c: 'Hạ Vy', url_c: '/characters/Hạ Vy.png', built_in_c: true },
   'Mai': { key_c: 'Mai', name_c: 'Mai', url_c: '/characters/Mai.png', built_in_c: true },
   'Minh Khoa': { key_c: 'Minh Khoa', name_c: 'Minh Khoa', url_c: '/characters/Minh Khoa.png', built_in_c: true },
