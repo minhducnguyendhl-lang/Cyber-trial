@@ -6,6 +6,8 @@ import { useGame } from './GameState';
 export default function CluePanel({ compact = false }) {
   const { chapter, save, t } = useGame();
   const [flipped, setFlipped] = useState({});
+  const required = chapter.investigation_c.filter(task => task.required_c).map(task => task.clue_index_c);
+  const ready = required.every(index => save.clues_c.includes(index));
   return <div className={compact ? 'space-y-4' : 'grid gap-6 lg:grid-cols-[1.8fr_1fr]'}>
     <div className="relative">
       {!compact && <svg viewBox="0 0 700 700" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 hidden h-full w-full sm:block" aria-hidden="true">
@@ -53,12 +55,12 @@ export default function CluePanel({ compact = false }) {
             <p className="font-heading text-4xl font-semibold">{save.clues_c.length}<span className="text-lg text-muted-foreground"> / {chapter.clues_c.length}</span></p>
             <p className="mt-1 text-xs text-muted-foreground">{t('Đầu mối còn thiếu', 'Missing evidence')}: {chapter.clues_c.length - save.clues_c.length}</p>
           </div>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t('Cần ít nhất 3 manh mối. Bạn có thể xem lại hội thoại để tìm phần đã bỏ lỡ.', 'Find at least 3 clues. Replay dialogue to recover missed evidence.')}</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{t('Tìm đủ các manh mối bắt buộc bằng cách khám phá khu vực. Chương cuối có thêm chứng cứ độc lập không bắt buộc.', 'Find all required evidence by exploring the area. The final chapter has additional optional independent evidence.')}</p>
         </div>
       </details>
       <div className="sticky bottom-0 mt-4 bg-background py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        {save.clues_c.length >= 3 ? <Link to="/verdict" className="game-focus panel-cut flex min-h-14 items-center justify-center gap-3 bg-primary px-5 font-bold text-primary-foreground transition-colors hover:bg-primary/90"><ApperIcon name="Gavel" className="h-5 w-5"/>{t('Đi đến Phán Quyết', 'Make a verdict')}</Link>
-          : <div className="panel-cut flex min-h-14 items-center justify-center gap-2 bg-muted px-4 text-sm text-muted-foreground"><ApperIcon name="Lock" className="h-4 w-4"/>{t('Cần thêm manh mối', 'More evidence needed')}</div>}
+        {ready ? <Link to="/verdict" className="game-focus panel-cut flex min-h-14 items-center justify-center gap-3 bg-primary px-5 font-bold text-primary-foreground transition-colors hover:bg-primary/90"><ApperIcon name="Gavel" className="h-5 w-5"/>{t('Đi đến phiên tòa', 'Go to trial')}</Link>
+          : <Link to="/investigation" className="game-focus panel-cut flex min-h-14 items-center justify-center gap-2 bg-muted px-4 text-sm text-muted-foreground"><ApperIcon name="Search" className="h-4 w-4"/>{t('Tiếp tục tìm chứng cứ', 'Continue investigating')}</Link>}
       </div>
     </div>
   </div>;

@@ -173,24 +173,7 @@ export const CHAPTERS = buildCyberChapters(SAFETY_CASES);
 export const CAST = CYBER_CAST;
 
 export function scenesFor(chapter) {
-  if (chapter?.scenes_c) return chapter.scenes_c;
-  if (!chapter) return [];
-  const question = (index, clue) => ({
-    speaker_c: 'An', text_c: chapter.questions_c[index][0],
-    english_c: 'Which response protects the victim? Review the evidence before deciding.',
-    choices_c: chapter.questions_c[index].slice(1), clue_c: clue,
-    emotion_c: 'suspicious', warning_c: true
-  });
-  return [
-    { speaker_c: 'An', text_c: chapter.intro_c, english_c: 'A suspicious message has reached a student. Your investigation begins.', emotion_c: 'neutral' },
-    { speaker_c: chapter.suspect_c, text_c: chapter.lure_c, english_c: 'The sender offers trust, rewards or urgent help. Something does not add up.', auto_clue_c: 1, emotion_c: 'happy', warning_c: true },
-    question(0, 0),
-    { speaker_c: chapter.victim_c.split(' · ')[0], text_c: chapter.pressure_c, english_c: 'The victim is pressured to act before checking the request.', emotion_c: 'scared', warning_c: true },
-    question(1, 2),
-    { speaker_c: 'An', text_c: chapter.twist_c, english_c: 'An independent source contradicts the sender. Keep this evidence.', auto_clue_c: 3, emotion_c: 'shocked' },
-    question(2, 4),
-    { speaker_c: 'An', text_c: chapter.ending_c, english_c: 'You can pause, verify and ask for help. Review your evidence and make a verdict.', emotion_c: 'neutral' }
-  ];
+  return chapter?.scenes_c || [];
 }
 
 export const REPORT_TEXT = 'Nếu đã chuyển tiền, liên hệ ngay ngân hàng qua ứng dụng hoặc số chính thức để đề nghị hỗ trợ. Lưu tin nhắn, số tài khoản, biên lai và trình báo cơ quan công an gần nhất. Nếu có nguy hiểm tức thời, gọi 113. Không trả tiền cho người hứa “thu hồi tiền lừa đảo”.';

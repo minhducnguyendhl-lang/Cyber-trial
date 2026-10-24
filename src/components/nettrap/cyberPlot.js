@@ -1,3 +1,5 @@
+import { investigationFor, TRIALS } from './investigationContent';
+
 const line = (speaker_c, text_c, emotion_c = 'neutral') => ({ speaker_c, text_c, english_c: text_c, emotion_c });
 const person = (name_c, role_c, age, bio_c, slogan_c, variant_c = 'detective') => ({
   key_c: name_c, name_c, role_c, chapter_c: 0, variant_c,
@@ -173,30 +175,23 @@ const INCIDENT_REACTIONS = [
 export function buildCyberChapters(safety) {
   return plots.map((plot, i) => {
     const base = safety[plot.safety_c];
-    const methods = [
-      ['Mở nội dung gốc và đối chiếu lời khai', 'Coi tên tài khoản là danh tính người thao tác', 'Xóa dữ liệu vì nội dung khiến mọi người hoảng sợ'],
-      ['Đối chiếu nguồn và thời điểm xuất hiện', 'Tin giao diện quen thuộc là đủ', 'Chỉ hỏi người đưa tệp có đáng tin không'],
-      ['Kiểm tra bản ghi nguồn và giới hạn điều nó chứng minh', 'Dùng bản tóm tắt thay bản gốc', 'Kết luận người bị nghi là chủ mưu ngay'],
-      ['Hỏi người liên quan rồi đối chiếu với nguồn khác', 'Ép họ nhận lỗi khi đang sợ hãi', 'Công khai dữ liệu riêng để gây áp lực'],
-      ['Lưu nguồn, liên kết các hồ sơ và kiểm tra quyền truy cập', 'Giao khóa dữ liệu cho người hứa cứu nhóm', 'Chỉ tin trực giác của An']
+    const incidentLeadIns = [
+      'Tại Trung tâm Học bổng, màn hình của Yến chuyển đỏ; cửa khu vực khóa lại.',
+      'Cuộc gọi của Mai vừa ngắt thì ngân hàng tối sầm; cửa giao dịch đỏ lên.',
+      'Bảng tín dụng đóng băng và số dư chung biến mất khỏi màn hình.',
+      'Một tin nhắn cầu cứu vang lên; cửa bảo mật khu căn hộ bật mở.',
+      'Bảng công khai trong văn phòng sáng lên cùng hồ sơ của cả nhóm.',
+      'Cửa Kho Lưu Trữ khóa lại; một danh sách nội bộ hiện trên màn hình.',
+      'Tại quảng trường, Vũ Khải bước tới khi sáu hồ sơ vụ án đồng loạt mở ra.'
     ];
-    const investigate = plot.clues_c.map((clue, index) => ({
-      ...line('An', [
-        `Khoan, ở đây có một dấu vết: ${clue[0]}. Mọi người cho tôi xem nội dung gốc nhé. Chúng ta cần biết nó nói gì trước khi đoán người đứng sau.`,
-        `${clue[0]}… Có điều không khớp. Linh, cùng tôi kiểm tra nguồn và thời điểm xuất hiện được không?`,
-        `Tôi muốn xem kỹ ${clue[0]}. Nó có thể giúp chúng ta, nhưng đừng bắt nó chứng minh nhiều hơn những gì thực sự ghi lại.`,
-        `Còn ${clue[0]}. Tôi muốn nghe người liên quan kể lại trước, rồi mới đối chiếu. Không ai cần trả lời chỉ vì bị ép.`,
-        `${clue[0]} có thể nối vụ này với những gì đã xảy ra. Giữ lại bản gốc nhé. Chúng ta kiểm tra từng bước, không đoán tắt.`
-      ][index], 'suspicious'),
-      investigation_c: index,
-      choices_c: methods[index],
-      clue_c: index,
-      reasoning_c: `${clue[1]} ${clue[3]} Tôi sẽ lưu cả nội dung và nguồn, không biến một dấu vết thành kết luận vượt quá điều nó chứng minh.`
-    }));
+    const incidentDialogue = plot.incident_c.filter(entry => !(i === 1 && entry.speaker_c === 'Quân') && !(i === 2 && entry.speaker_c === 'Đức') && !(i === 5 && entry.speaker_c === 'Bảo Linh'));
     return {
       ...base, ...plot, key_c: `cyber-${i + 1}`, number_c: String(i + 1).padStart(2, '0'),
       setting_c: `Mê Cung Số · Khu ${String(i + 1).padStart(2, '0')} · ${plot.setting_c}`,
       scene_c: ['maze-school', 'maze-bank', 'maze-market', 'maze-residence', 'maze-office', 'maze-archive', 'maze-hub'][i],
+      investigation_c: investigationFor(i, plot.clues_c),
+      trial_c: TRIALS[i],
+      required_clues_c: i === 6 ? 2 : 5,
       title_en_c: plot.title_c, short_c: plot.category_c, difficulty_c: i < 2 ? 'Dễ' : i < 5 ? 'Trung Bình' : 'Khó',
       intro_c: plot.incident_c.map(n => n.text_c).join(' '),
       twist_c: plot.aftermath_c.at(-1).text_c,
@@ -213,17 +208,17 @@ export function buildCyberChapters(safety) {
         : i === 5 ? 'Không trả phí trước hoặc giao mật khẩu, OTP, khóa bằng chứng cho dịch vụ hứa phục hồi. Bảo toàn bản gốc và xác minh nguồn độc lập.'
         : i === 6 ? 'Bàn giao bản gốc và danh mục nguồn để điều tra độc lập; bảo vệ dữ liệu cá nhân, ghi rõ những điểm chưa đủ căn cứ kết luận.' : base.action_c,
       definition_c: `${plot.category_c}: ${plot.hook_c} ${plot.clues_c[0][3]}`,
-      scenes_c: [...(i === 0 ? PROLOGUE : []), plot.incident_c[0],
+      scenes_c: [...(i === 0 ? PROLOGUE : []),
+        line('An', incidentLeadIns[i], 'shocked'),
         { ...line('Cyber-M', INCIDENT_NOTICES[i]), warning_c: true },
-        ...plot.incident_c.slice(1), ...INCIDENT_REACTIONS[i], ...investigate,
-        line('Cyber-M', 'Giai đoạn điều tra kết thúc. Mang những bằng chứng đã thu thập đến Phiên Tòa Tranh Luận. Ta đang chờ kết luận của các ngươi.'),
-        line('An', 'Đã đến lúc đối chiếu lời khai với chứng cứ. Tôi không muốn mất thêm ai. Nhưng nỗi sợ của tôi không được trở thành lý do để kết tội một người khác.', 'determined')]
+        ...incidentDialogue, ...INCIDENT_REACTIONS[i],
+        line('An', 'Chúng ta sẽ tìm chứng cứ tại hiện trường. Không ai phải thú nhận chỉ vì đang sợ; hãy để các bản ghi được kiểm tra trước.', 'determined')]
     };
   });
 }
 
 export const ENDINGS = {
-  true: { title_c: 'Sự thật được xác minh', scene_c: 'city', frames_c: [
+  true: { title_c: 'Sự thật được xác minh', scene_c: 'white-room', frames_c: [
     line('An', 'Danh mục nguồn đã được gửi đến điểm tiếp nhận độc lập. Hệ thống quản trị bị cô lập. Cyber-M mở các vùng lưu trữ. Cánh cửa cuối cùng sáng lên.'),
     line('Mai', 'Họ còn sống! Quân, Đức, Vy, Phúc… tất cả được tìm thấy. Chúng ta thực sự ra ngoài rồi!', 'happy'),
     line('An', 'Tôi tỉnh trong cơ sở y tế. Khi nhìn đủ mười người, tôi mới thở ra. Lần đầu tiên, nhẹ nhõm không đến từ việc mình đoán đúng, mà từ việc không ai phải bị bỏ lại.', 'happy'),
@@ -231,13 +226,13 @@ export const ENDINGS = {
     line('An', 'Không. Bàn giao bản gốc, lập danh mục nguồn, giữ bản sao được kiểm soát. Tôi đã học rằng phá án không phải chứng minh mình thông minh hơn người khác.', 'happy'),
     line('An', 'Mạng Nhện chưa biến mất sau một đêm. Vũ Khải bị truy tìm; mọi chứng cứ vẫn phải được xác minh theo quy trình. Nếu một Cyber-M khác xuất hiện, tôi sẽ hỏi ai điều khiển nó, dữ liệu từ đâu, và ai có quyền kiểm tra.')
   ] },
-  normal: { title_c: 'Bản án chưa hoàn tất', scene_c: 'school', frames_c: [
+  normal: { title_c: 'Bản án chưa hoàn tất', scene_c: 'maze-hub', frames_c: [
     line('An', 'Chúng tôi xác định được Khải, nhưng chuỗi nguồn độc lập còn thiếu. Nhóm thoát khỏi mô phỏng; dữ liệu quan trọng vẫn nằm ngoài tầm kiểm soát.'),
     line('Yến', 'Em mừng vì nhìn thấy bầu trời thật. Nhưng những người khác ngoài kia có còn nhận tin nhắn từ hệ thống ấy không?', 'scared'),
     line('An', 'Tôi không nói vụ án đã xong chỉ để mọi người yên tâm. Tôi bàn giao những gì có thể kiểm tra, ghi rõ phần chưa xác minh. Chúng tôi sẽ tiếp tục cùng nhau.'),
     line('An', 'Mạng Nhện bị tổn thương, chưa bị bóc gỡ. Niềm tin không thể trở lại bằng một lời hứa. Hãy chơi lại các chương, tìm đủ chứng cứ và giữ chuỗi nguồn để mở kết thúc chính.')
   ] },
-  bad: { title_c: 'Phán quyết của Cyber-M', scene_c: 'digital', frames_c: [
+  bad: { title_c: 'Phán quyết của Cyber-M', scene_c: 'court', frames_c: [
     line('Cyber-M', 'Linh đã bị kết tội. Các ngươi đã chọn bản tóm tắt của ta thay cho quyền kiểm tra nguồn. Ta không cần ra lệnh: con người tự hoàn thành phần còn lại.'),
     line('Bảo Linh', 'An… đừng để lời khai của tôi biến mất. Tôi đã cố cứu họ. Tôi sợ, nhưng tôi không tạo ra chuyện này.', 'scared'),
     line('An', 'Cánh cửa đóng. Tôi nhận ra quá muộn: tôi đã gọi một phán quyết không được kiểm tra là sự thật. Chiến dịch thao túng ngoài kia lại bắt đầu.', 'scared'),

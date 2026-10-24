@@ -17,16 +17,14 @@ export default function Aftermath() {
   const [frame, setFrame] = useState(0);
   const [ending, setEnding] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const verdict = save.verdicts_c?.[save.active_c];
-  const endingKey = save.verdicts_c?.[5]?.correct_c === false || verdict?.correct_c === false ? 'bad'
-    : CHAPTERS.every((_, i) => save.verdicts_c?.[i]?.stars_c === 3) ? 'true' : 'normal';
+  const endingKey = save.route_c === 'bad' ? 'bad' : save.ending_c === 'true' ? 'true' : 'normal';
   const film = ENDINGS[endingKey];
   const failed = [
     { speaker_c: 'Cyber-M', text_c: 'Phán quyết sai. Một phần hồ sơ đã bị công khai trong mô phỏng. Các ngươi đã trao quyền quyết định cho nỗi sợ.', emotion_c: 'neutral' },
     { speaker_c: 'An', text_c: `Mọi người nhìn nhau, không biết lời nào còn có thể tin. Tôi đã kết luận vượt quá chứng cứ. Tôi phải sửa sai: ${chapter.verdict_c[0]} Không ai đáng bị quy hết trách nhiệm chỉ vì đã bị lừa.`, emotion_c: 'scared' },
     ...(save.active_c === 5 ? [{ speaker_c: 'Bảo Linh', text_c: 'Cửa Kho Lưu Trữ đang đóng… An, tôi không phải chủ mưu. Xin giữ lại lời khai và tìm nguồn gốc, đừng chỉ giữ phán quyết.', emotion_c: 'scared' }] : [])
   ];
-  const frames = ending ? film.frames_c : verdict?.correct_c ? chapter.aftermath_c : failed;
+  const frames = ending ? film.frames_c : chapter.aftermath_c;
   const current = frames[Math.min(frame, frames.length - 1)];
   const last = frame === frames.length - 1;
 
@@ -38,14 +36,14 @@ export default function Aftermath() {
 
   function proceed() {
     if (!last) { setFrame(f => f + 1); return; }
-    if (!ending && (save.active_c === CHAPTERS.length - 1 || (save.active_c === 5 && !verdict.correct_c))) {
+    if (!ending && (save.active_c === CHAPTERS.length - 1 || (save.active_c === 5 && save.route_c === 'bad'))) {
       setEnding(true); setFrame(0); setPlaying(!reduced); return;
     }
     if (ending) { navigate('/chapters'); return; }
     startChapter(save.active_c + 1); navigate('/play');
   }
 
-  if (!save.has_session_c || !verdict) return <Navigate to="/chapters" replace/>;
+  if (!save.has_session_c) return <Navigate to="/chapters" replace/>;
   return <section className="relative isolate flex min-h-[calc(100dvh-3.5rem)] flex-col justify-between overflow-hidden bg-background">
     <div className="pointer-events-none absolute inset-0 -z-10">
       <SceneArt scene={ending ? film.scene_c : chapter.scene_c} portrait={false} className="h-full w-full" preserveAspectRatio="xMidYMid slice"/>
@@ -67,7 +65,7 @@ export default function Aftermath() {
         <p className="text-sm text-muted-foreground">{frame + 1}/{frames.length} · Tiến trình đã lưu{ending ? ' · Hoạt cảnh trong game, không phải video dựng sẵn' : ''}</p>
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={() => { replayChapter(save.active_c); navigate('/play'); }} className="active:scale-[0.98]">Điều tra lại</Button>
-          <Button onClick={proceed} className="active:scale-[0.98]">{!last ? 'Tiếp tục' : ending ? 'Về chọn chương' : save.active_c === 6 || (save.active_c === 5 && !verdict.correct_c) ? 'Xem kết thúc' : 'Chương tiếp theo'}</Button>
+          <Button onClick={proceed} className="active:scale-[0.98]">{!last ? 'Tiếp tục' : ending ? 'Về chọn chương' : save.active_c === 6 || (save.active_c === 5 && save.route_c === 'bad') ? 'Xem kết thúc' : 'Chương tiếp theo'}</Button>
         </div>
       </div>
     </div>

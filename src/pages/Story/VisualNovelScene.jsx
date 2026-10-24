@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { toast } from 'sonner';
 import ApperIcon from '@/components/ApperIcon';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -15,7 +14,7 @@ import { characterName, characterText } from '@/components/nettrap/characterImag
 export const route = { path: '/play', layout: 'public', access: 'public' };
 
 export default function VisualNovelScene() {
-  const { save, chapter, setScene, collectClue, sound, t, english, setSettingsOpen } = useGame();
+  const { save, chapter, setScene, t, english, setSettingsOpen } = useGame();
   const navigate = useNavigate();
   const reduced = useReducedMotion();
   const scenes = scenesFor(chapter);
@@ -26,13 +25,9 @@ export default function VisualNovelScene() {
   const [cluesOpen, setCluesOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
-  const [response, setResponse] = useState(null);
-  const [choiceOrder, setChoiceOrder] = useState([1, 0, 2]);
 
   useEffect(() => {
     setVisible(reduced ? text.length : 0);
-    setResponse(null);
-    setChoiceOrder(save.scene_c % 2 ? [2, 0, 1] : [1, 2, 0]);
     if (reduced) return;
     const speed = [55, 27, 9][TEXT_SPEEDS.indexOf(save.settings_c.speed_c)] || 27;
     const interval = setInterval(() => setVisible(v => {
@@ -42,50 +37,25 @@ export default function VisualNovelScene() {
     return () => clearInterval(interval);
   }, [save.scene_c, save.active_c, text, save.settings_c.speed_c, reduced]);
 
-  useEffect(() => {
-    if (save.has_session_c && node.auto_clue_c != null && !save.clues_c.includes(node.auto_clue_c)) {
-      collectClue(node.auto_clue_c);
-      toast.success(t('Manh mối thu thập!', 'Evidence collected!'));
-    }
-  }, [save.active_c, save.scene_c, save.has_session_c, node.auto_clue_c, save.clues_c]);
-
   function next() {
     if (visible < text.length) { setVisible(text.length); return; }
-    if (node.choices_c && !response) return;
-    if (save.scene_c === scenes.length - 1) navigate('/clues');
+    if (save.scene_c === scenes.length - 1) navigate('/investigation');
     else setScene(save.scene_c + 1);
   }
 
   useEffect(() => {
-    if (!auto || node.choices_c || visible < text.length || cluesOpen || menuOpen || exitOpen) return;
+    if (!auto || visible < text.length || cluesOpen || menuOpen || exitOpen) return;
     const timer = setTimeout(() => {
       if (save.scene_c < scenes.length - 1) setScene(save.scene_c + 1);
       else setAuto(false);
     }, 2600);
     return () => clearTimeout(timer);
-  }, [auto, visible, text.length, save.scene_c, node.choices_c, cluesOpen, menuOpen, exitOpen]);
-
-  function choose(index) {
-    if (response) return;
-    const correct = index === 0;
-    sound(correct);
-    if (correct) {
-      if (!save.clues_c.includes(node.clue_c)) {
-        collectClue(node.clue_c);
-        toast.success(t('Manh mối thu thập!', 'Evidence collected!'));
-      }
-      const clue = chapter.clues_c[node.clue_c];
-      setResponse(`Vật chứng — ${clue[0]}: “${clue[2]}”\n\nAn: “${node.reasoning_c || 'Kiểm chứng độc lập giúp chúng ta thoát khỏi câu chuyện mà kẻ gian dựng lên.'}”`);
-    } else {
-      setResponse(t('An: “Lựa chọn này khiến nạn nhân tiếp tục chịu áp lực. Chúng ta đã bỏ lỡ một manh mối. Bạn có thể xem lại cảnh để kiểm tra lần nữa.”', 'An: “This response leaves the victim under pressure. A clue was missed. Replay this scene to investigate again.”'));
-      toast.info(t('Đừng vội. Có thể kiểm tra lại trong menu cảnh.', 'You can replay this scene from the scene menu.'));
-    }
-  }
+  }, [auto, visible, text.length, save.scene_c, cluesOpen, menuOpen, exitOpen]);
 
   if (!save.has_session_c) return <Navigate to="/chapters" replace/>;
   return <div className="relative isolate min-h-[calc(100dvh-3.5rem)] overflow-hidden">
     <motion.div key={`${chapter.key_c}-${save.scene_c > 4}`} initial={reduced ? false : { opacity: .3 }} animate={{ opacity: 1 }} transition={{ duration: .35 }} className="pointer-events-none absolute inset-0 -z-10">
-      <SceneArt scene={chapter.scene_c} portrait={false} className="h-full w-full" preserveAspectRatio="xMidYMid slice"/>
+      <SceneArt scene={node.scene_c || chapter.scene_c} className="h-full w-full" preserveAspectRatio="xMidYMid slice"/>
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/10 to-background/30"/>
     </motion.div>
     {node.warning_c && <div className="flag-pulse pointer-events-none absolute inset-0 z-10 border-[5px] border-primary/30" aria-hidden="true"/>}
@@ -111,15 +81,10 @@ export default function VisualNovelScene() {
           <span className="shrink-0 text-xs text-muted-foreground">{node.warning_c && node.speaker_c === 'Cyber-M' ? 'Thông báo sự cố' : node.investigation_c != null ? 'Khám nghiệm chứng cứ' : ({ happy: 'Vui mừng', scared: 'Sợ hãi', shocked: 'Hoang mang', confused: 'Hoang mang', determined: 'Kiên cường' }[node.emotion_c] || 'Đối thoại')}</span>
         </div>
         <button type="button" onClick={next} className="game-focus block min-h-20 w-full whitespace-pre-wrap break-words text-left text-base leading-[1.9] sm:text-lg" aria-label={visible < text.length ? 'Hiện toàn bộ hội thoại' : 'Đọc tiếp hội thoại'}>
-          {response ? characterText(response) : text.slice(0, visible)}
+          {text.slice(0, visible)}
           {visible < text.length && <span className="text-primary" aria-hidden="true">▌</span>}
         </button>
-        {node.choices_c && !response && visible >= text.length ? <div className="mt-4 grid gap-2">
-          {choiceOrder.map((originalIndex, displayIndex) => <motion.button key={`${save.scene_c}-${originalIndex}`} type="button" initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .15, delay: displayIndex * .04 }}
-            onClick={() => choose(originalIndex)} className="game-focus panel-cut flex min-h-12 items-center gap-3 border border-border bg-card px-4 py-3 text-left text-sm leading-relaxed transition-colors duration-(--transition-fast) hover:border-primary hover:bg-muted active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50">
-            <span className="font-heading text-xl font-bold text-primary">{String.fromCharCode(65 + displayIndex)}</span>{characterText(node.choices_c[originalIndex])}
-          </motion.button>)}
-        </div> : <div className="mt-4 flex justify-end"><Button onClick={next} variant="ghost" className="h-11 px-4 font-semibold text-accent-foreground hover:bg-secondary">{save.scene_c === scenes.length - 1 ? t('Xem manh mối', 'Review evidence') : t('Tiếp tục', 'Continue')}<ApperIcon name="ChevronRight" className="ml-2 h-4 w-4"/></Button></div>}
+        <div className="mt-4 flex justify-end"><Button onClick={next} variant="ghost" className="h-11 px-4 font-semibold text-accent-foreground hover:bg-secondary">{save.scene_c === scenes.length - 1 ? t('Bắt đầu điều tra', 'Start investigation') : t('Tiếp tục', 'Continue')}<ApperIcon name="ChevronRight" className="ml-2 h-4 w-4"/></Button></div>
       </div>
     </section>
     <Sheet open={cluesOpen} onOpenChange={setCluesOpen}>
@@ -132,7 +97,7 @@ export default function VisualNovelScene() {
       <SheetContent side="bottom" className="mx-auto flex max-h-[75vh] max-w-xl flex-col gap-0 border-border bg-card p-0">
         <SheetHeader className="shrink-0 border-b border-border p-6"><SheetTitle className="font-heading text-3xl">Xem lại cảnh</SheetTitle><SheetDescription>Không xóa chứng cứ đã thu thập. Chọn một cảnh đã xem để điều tra lại.</SheetDescription></SheetHeader>
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-6">
-          {scenes.map((scene, i) => <Button key={i} disabled={!save.viewed_c.includes(i)} variant="outline" onClick={() => { setScene(i); setMenuOpen(false); setAuto(false); }} className="h-auto min-h-12 w-full justify-start whitespace-normal border-border py-3 text-left text-sm">Cảnh {i + 1} · {scene.choices_c ? 'Suy luận' : scene.speaker_c}{!save.viewed_c.includes(i) && <ApperIcon name="Lock" className="ml-auto h-4 w-4"/>}</Button>)}
+          {scenes.map((scene, i) => <Button key={i} disabled={!save.viewed_c.includes(i)} variant="outline" onClick={() => { setScene(i); setMenuOpen(false); setAuto(false); }} className="h-auto min-h-12 w-full justify-start whitespace-normal border-border py-3 text-left text-sm">Cảnh {i + 1} · {scene.speaker_c}{!save.viewed_c.includes(i) && <ApperIcon name="Lock" className="ml-auto h-4 w-4"/>}</Button>)}
           <Button variant="ghost" onClick={() => { setMenuOpen(false); setSettingsOpen(true); }} className="h-12 w-full text-primary hover:bg-muted">Cài đặt</Button>
         </div>
       </SheetContent>
