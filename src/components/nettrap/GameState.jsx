@@ -3,39 +3,61 @@ import { toast } from 'sonner';
 import { CHAPTERS, TEXT_SPEEDS, LANGUAGES, scenesFor } from './story';
 
 const GameContext = createContext(null);
-const STORAGE_KEY = 'cyber-trial-save-v2';
+const STORAGE_KEY = 'cyber-trial-save-v3';
+const LEGACY_STORAGE_KEY = 'cyber-trial-save-v2';
 const emptySave = () => ({
-  version_c: 1, active_c: 0, scene_c: 0, viewed_c: [0], clues_c: [],
-  sessions_c: {}, completed_c: {}, verdicts_c: {}, has_session_c: false, newest_c: null,
+  version_c: 2, active_c: 0, scene_c: 0, viewed_c: [0], clues_c: [], investigation_c: [],
+  sessions_c: {}, completed_c: {}, route_c: null, ending_c: null, has_session_c: false, newest_c: null,
   settings_c: { muted_c: true, sfx_c: true, volume_c: 25, speed_c: TEXT_SPEEDS[1], language_c: LANGUAGES[0] }
 });
 function readSave() {
   const fallback = emptySave();
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    if (!raw || raw.version_c !== 1) return fallback;
+    const current = localStorage.getItem(STORAGE_KEY);
+    const raw = JSON.parse(current || localStorage.getItem(LEGACY_STORAGE_KEY) || 'null');
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return fallback;
+    const legacy = !current;
     const completed = {};
     CHAPTERS.forEach((_, i) => {
-      const stars = Number(raw.completed_c?.[i]);
-      if (stars >= 1 && stars <= 3) completed[i] = Math.floor(stars);
+      const value = raw.completed_c?.[i];
+      if (value === true || (Number(value) >= 1 && Number(value) <= 3)) completed[i] = true;
     });
     const active = Math.max(0, Math.min(CHAPTERS.length - 1, Math.floor(Number(raw.active_c) || 0)));
     const cleanIndices = (value, max) => Array.isArray(value) ? [...new Set(value.filter(n => Number.isInteger(n) && n >= 0 && n < max))] : [];
+    const sessions = {};
+    if (!legacy && raw.sessions_c && typeof raw.sessions_c === 'object' && !Array.isArray(raw.sessions_c)) {
+      CHAPTERS.forEach((_, index) => {
+        const session = raw.sessions_c[index];
+        if (!session || typeof session !== 'object') return;
+        const count = Math.max(1, scenesFor(CHAPTERS[index]).length);
+        sessions[index] = {
+          scene_c: Math.max(0, Math.min(count - 1, Math.floor(Number(session.scene_c) || 0))),
+          viewed_c: cleanIndices(session.viewed_c, count),
+          clues_c: cleanIndices(session.clues_c, 5),
+          investigation_c: cleanIndices(session.investigation_c, 5)
+        };
+      });
+    }
+    const validActiveSceneCount = Math.max(1, scenesFor(CHAPTERS[active]).length);
+    const cleanSettings = raw.settings_c && typeof raw.settings_c === 'object' ? raw.settings_c : {};
     return {
       ...fallback, active_c: active,
-      scene_c: Math.max(0, Math.min(scenesFor(CHAPTERS[active]).length - 1, Math.floor(Number(raw.scene_c) || 0))),
-      viewed_c: cleanIndices(raw.viewed_c, scenesFor(CHAPTERS[active]).length),
-      clues_c: cleanIndices(raw.clues_c, 5),
-      sessions_c: raw.sessions_c && typeof raw.sessions_c === 'object' ? raw.sessions_c : {},
-      completed_c: completed, verdicts_c: raw.verdicts_c && typeof raw.verdicts_c === 'object' ? raw.verdicts_c : {}, has_session_c: Boolean(raw.has_session_c),
+      scene_c: legacy ? 0 : Math.max(0, Math.min(validActiveSceneCount - 1, Math.floor(Number(raw.scene_c) || 0))),
+      viewed_c: legacy ? [0] : cleanIndices(raw.viewed_c, validActiveSceneCount),
+      clues_c: legacy ? [] : cleanIndices(raw.clues_c, 5),
+      investigation_c: legacy ? [] : cleanIndices(raw.investigation_c, 5),
+      sessions_c: sessions, completed_c: completed,
+      route_c: !legacy && ['bad', 'independent'].includes(raw.route_c) ? raw.route_c : null,
+      ending_c: !legacy && ['bad', 'normal', 'true'].includes(raw.ending_c) ? raw.ending_c : null,
+      has_session_c: !legacy && Boolean(raw.has_session_c),
       newest_c: Number.isInteger(raw.newest_c) ? raw.newest_c : null,
       settings_c: {
         ...fallback.settings_c,
-        muted_c: raw.settings_c?.muted_c !== false,
-        sfx_c: raw.settings_c?.sfx_c !== false,
-        volume_c: Math.min(100, Math.max(0, Number(raw.settings_c?.volume_c) || 0)),
-        speed_c: TEXT_SPEEDS.includes(raw.settings_c?.speed_c) ? raw.settings_c.speed_c : TEXT_SPEEDS[1],
-        language_c: LANGUAGES.includes(raw.settings_c?.language_c) ? raw.settings_c.language_c : LANGUAGES[0]
+        muted_c: cleanSettings.muted_c !== false,
+        sfx_c: cleanSettings.sfx_c !== false,
+        volume_c: Math.min(100, Math.max(0, Number(cleanSettings.volume_c) || 0)),
+        speed_c: TEXT_SPEEDS.includes(cleanSettings.speed_c) ? cleanSettings.speed_c : TEXT_SPEEDS[1],
+        language_c: LANGUAGES.includes(cleanSettings.language_c) ? cleanSettings.language_c : LANGUAGES[0]
       }
     };
   } catch { return fallback; }
@@ -116,51 +138,59 @@ export function GameProvider({ children }) {
     setSave(s => ({ ...s, settings_c: { ...s.settings_c, ...patch } }));
   }
   function startChapter(index) {
+    if (!Number.isInteger(index) || index < 0 || index >= CHAPTERS.length) return false;
     if (index > 0 && !save.completed_c[index - 1]) return false;
+    if (index === 6 && save.route_c !== 'independent') return false;
     setSave(s => {
       const savedSession = s.sessions_c[index];
       const validClues = Array.isArray(savedSession?.clues_c) ? savedSession.clues_c.filter(n => Number.isInteger(n) && n >= 0 && n < 5) : [];
+      const validInvestigation = Array.isArray(savedSession?.investigation_c) ? savedSession.investigation_c.filter(n => Number.isInteger(n) && n >= 0 && n < 5) : [];
       const sceneCount = scenesFor(CHAPTERS[index]).length;
       const validViewed = Array.isArray(savedSession?.viewed_c) ? savedSession.viewed_c.filter(n => Number.isInteger(n) && n >= 0 && n < sceneCount) : [0];
       return { ...s, active_c: index, scene_c: Math.min(sceneCount - 1, Math.max(0, Number(savedSession?.scene_c) || 0)),
-        clues_c: validClues, viewed_c: validViewed, has_session_c: true };
+        clues_c: validClues, investigation_c: validInvestigation, viewed_c: validViewed, has_session_c: true };
     });
     return true;
   }
-  function setScene(index, clue) {
+  function setScene(index) {
     setSave(s => {
-      const clues = clue == null ? s.clues_c : [...new Set([...s.clues_c, clue])];
       const viewed = [...new Set([...s.viewed_c, index])];
-      return { ...s, scene_c: index, clues_c: clues, viewed_c: viewed,
-        sessions_c: { ...s.sessions_c, [s.active_c]: { scene_c: index, clues_c: clues, viewed_c: viewed } } };
+      return { ...s, scene_c: index, viewed_c: viewed,
+        sessions_c: { ...s.sessions_c, [s.active_c]: { scene_c: index, clues_c: s.clues_c, viewed_c: viewed, investigation_c: s.investigation_c } } };
     });
   }
-  function collectClue(index) {
+  function completeInvestigation(index) {
+    if (!Number.isInteger(index) || index < 0 || index >= 5) return;
     setSave(s => {
       const clues = [...new Set([...s.clues_c, index])];
-      return { ...s, clues_c: clues, sessions_c: { ...s.sessions_c, [s.active_c]: {
-        scene_c: s.scene_c, clues_c: clues, viewed_c: s.viewed_c
+      const investigation = [...new Set([...s.investigation_c, index])];
+      return { ...s, clues_c: clues, investigation_c: investigation, sessions_c: { ...s.sessions_c, [s.active_c]: {
+        scene_c: s.scene_c, clues_c: clues, viewed_c: s.viewed_c, investigation_c: investigation
       } } };
     });
   }
-  function finishChapter(stars, correct) {
-    setSave(s => ({
-      ...s, completed_c: { ...s.completed_c, [s.active_c]: Math.max(stars, s.completed_c[s.active_c] || 0) },
-      verdicts_c: { ...s.verdicts_c, [s.active_c]: { correct_c: Boolean(correct), stars_c: stars } },
-      newest_c: s.active_c + 1 < CHAPTERS.length && !s.completed_c[s.active_c + 1] ? s.active_c + 1 : null
-    }));
+  function finishChapter(outcome = {}) {
+    setSave(s => {
+      const completed = { ...s.completed_c, [s.active_c]: true };
+      const route = s.active_c === 5 && ['bad', 'independent'].includes(outcome.route_c) ? outcome.route_c : s.route_c;
+      const ending = s.active_c === 6 && ['normal', 'true'].includes(outcome.ending_c) ? outcome.ending_c : route === 'bad' ? 'bad' : s.ending_c;
+      const next = s.active_c + 1;
+      return { ...s, completed_c: completed, route_c: route, ending_c: ending,
+        newest_c: next < CHAPTERS.length && !completed[next] && !(next === 6 && route !== 'independent') ? next : null };
+    });
   }
   function replayChapter(index) {
-    setSave(s => ({ ...s, active_c: index, scene_c: 0, clues_c: [], viewed_c: [0], has_session_c: true,
-      sessions_c: { ...s.sessions_c, [index]: { scene_c: 0, clues_c: [], viewed_c: [0] } } }));
+    if (!Number.isInteger(index) || index < 0 || index >= CHAPTERS.length) return;
+    setSave(s => ({ ...s, active_c: index, scene_c: 0, clues_c: [], investigation_c: [], viewed_c: [0], has_session_c: true,
+      route_c: index === 5 ? null : s.route_c, ending_c: index >= 5 ? null : s.ending_c,
+      sessions_c: { ...s.sessions_c, [index]: { scene_c: 0, clues_c: [], viewed_c: [0], investigation_c: [] } } }));
   }
   function reset() { setSave(s => ({ ...emptySave(), settings_c: s.settings_c })); }
   const chapter = CHAPTERS[save.active_c] || CHAPTERS[0];
   return <GameContext.Provider value={{
     save, chapter, t, english, settingsOpen, setSettingsOpen, setSettings,
-    startChapter, replayChapter, setScene, collectClue, finishChapter, reset, sound,
-    totalStars: Object.values(save.completed_c).reduce((sum, value) => sum + value, 0),
-    totalCompleted: Object.keys(save.completed_c).length
+     startChapter, replayChapter, setScene, completeInvestigation, finishChapter, reset, sound,
+     totalCompleted: Object.keys(save.completed_c).length
   }}>{children}</GameContext.Provider>;
 }
 export function useGame() {

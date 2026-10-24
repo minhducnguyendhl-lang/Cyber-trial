@@ -1,3 +1,5 @@
+import { investigationFor, TRIALS } from './investigationContent';
+
 const line = (speaker_c, text_c, emotion_c = 'neutral') => ({ speaker_c, text_c, english_c: text_c, emotion_c });
 const person = (name_c, role_c, age, bio_c, slogan_c, variant_c = 'detective') => ({
   key_c: name_c, name_c, role_c, chapter_c: 0, variant_c,
@@ -18,29 +20,46 @@ export const CYBER_CAST = [
 ];
 
 const PROLOGUE = [
-  line('An', 'Tiếng kính vỡ. Một giọng nói quen thuộc. Rồi trắng xóa. Tôi tỉnh dậy trên sàn phòng trắng, cổ tay bị khóa bởi chiếc vòng điện tử. Màn hình chỉ còn một câu: ĐỪNG TIN VÀO NHỮNG GÌ CẬU NHỚ.', 'scared'),
-  line('Yến', 'Khoan… anh là An phải không? Đúng là anh rồi! Em đã xem những vụ án của anh! Em là Yến. Không ngờ lại được gặp anh ở đây… Có anh thì chắc chúng ta sẽ tìm được cách ra, đúng không?', 'happy'),
-  line('An', 'Yến, anh nghe em rồi. Nhưng anh cũng chưa biết đây là đâu. Đừng rời khỏi nhóm nhé. Mọi người, tôi là An. Ai còn nghe thấy tôi thì lên tiếng; chúng ta kiểm tra xem có ai bị thương trước đã.', 'determined'),
-  line('Mai', 'Có ai nghe thấy không? Cửa không mở! Xin đừng chen nhau… Mọi người có bị thương không?', 'scared'),
-  line('An', 'Chín sinh viên xa lạ đứng quanh tôi. Ngoài cửa kính không phải một thành phố, mà là mê cung ảo rộng đến mức không thấy điểm cuối. Những hành lang rẽ nhánh nối các khu học bổng, ngân hàng, ký túc xá và kho lưu trữ; giữa chúng là tường dữ liệu và cửa cách ly. Tôi không nhớ vì sao mình đến đây.', 'shocked'),
-  line('Cyber-M', 'Chào mừng đến với Mê Cung Số. Không được sống dưới danh tính giả, không được xóa dấu vết, không được rời đi trước khi sự thật được phán quyết.'),
-  line('Cyber-M', 'Mỗi phân khu là một không gian tách biệt. Các cổng dữ liệu chỉ mở theo quyền truy cập của ta. Đừng nhầm một hành lang sáng đèn với đường thoát: sau nó có thể là một ngõ cụt, hoặc một khu vực đã bị phong tỏa.'),
-  line('Cyber-M', 'Mỗi chương có một sự cố. Điều tra, thu thập bằng chứng số và tham gia Phiên Tòa Tranh Luận. Phán quyết sai sẽ làm lộ một phần hồ sơ cá nhân và tăng đe dọa trong mô phỏng. Người bị kết luận có lỗi sẽ bị thu hồi vào Kho Lưu Trữ. Sau bảy chương, người sống sót có cơ hội trở về.'),
-  line('Cyber-M', 'Ta đã đọc toàn bộ hồ sơ của các ngươi. Ta biết ai sẽ hoảng loạn, ai sẽ phản bội. Đặc biệt là cậu, An. Thiên tài của chúng ta sẽ phá bao nhiêu vụ án trước khi trở thành nạn nhân của chính suy luận mình?'),
-  line('Trâm', '“Thu hồi” là gì? Xóa danh tính… hay xóa cả chúng ta? Đừng ép ai trả lời khi họ đang hoảng loạn.', 'scared'),
-  line('An', 'Trước khi làm theo bất kỳ điều gì nó nói, chúng ta cần biết nhau. Tôi hai mươi tuổi, học luật. Có lẽ vài người biết những vụ tôi từng hỗ trợ… nhưng lúc này ký ức của tôi không rõ. Tôi sẽ không giả vờ mình có sẵn đáp án.', 'determined'),
-  line('Yến', 'Em mười chín tuổi, năm nhất. Em thường giúp mọi người dùng dịch vụ trực tuyến. Em nhớ anh từng nói một lời khai, một bức ảnh, một bản ghi đều có thể nói dối… Em vui vì gặp anh, nhưng nghe chữ “thu hồi” em vẫn sợ lắm.', 'confused'),
-  line('An', 'Sợ là bình thường, Yến. Em không phải tin anh chỉ vì đã thấy anh trên TV. Nếu anh bỏ sót điều gì, hãy hỏi lại. Giờ thì… ai muốn nói tiếp?', 'determined'),
-  line('Bảo Linh', 'Bảo Linh. Hai mươi mốt tuổi, học công nghệ thông tin. Gọi Linh cũng được. Tôi có thể đọc nhật ký truy cập… nếu nó cho chúng ta xem dữ liệu thật. Đừng chạm vào thiết bị lạ vội.', 'suspicious'),
-  line('Minh Khoa', 'Tôi là Minh Khoa, hai mươi tuổi. Làm nội dung trên mạng. Bình thường tôi nói nhiều lắm, mà giờ… thôi, ai nghe thấy tiếng tôi thì đứng gần lại. Đừng để ai lạc một mình.', 'confused'),
-  line('Hạ Vy', 'Hạ Vy, học báo chí, cùng tuổi An. Tôi muốn ghi lại lời nó vừa nói. Nếu luật thay đổi, ít nhất chúng ta còn biết lúc đầu nó đã hứa gì.', 'determined'),
-  line('Đức', 'Đức. Hai mươi mốt, tài chính ngân hàng. Tôi có thể giúp kiểm tra giao dịch. Nhưng… đừng nhìn tôi như thể tôi biết mọi thứ về chỗ này. Tôi cũng vừa tỉnh lại thôi.', 'confused'),
-  line('Mai', 'Tôi là Mai, hai mươi tuổi, học y. Ai chóng mặt hay khó thở thì nói với tôi nhé. Tôi chưa biết giúp được đến đâu, nhưng chúng ta đừng chen nhau trước cửa nữa.', 'determined'),
-  line('Phúc', 'Phúc, hai mươi hai tuổi. Tôi học phát triển phần mềm, làm trò chơi. Chỗ này giống một mô phỏng… nhưng tôi chưa biết nó vận hành thế nào. Tôi sẽ không thử mở cửa bừa.', 'suspicious'),
-  line('Trâm', 'Trâm, hai mươi tuổi, học tâm lý. Nếu cần, cứ ngồi xuống một lúc. Không ai phải tỏ ra bình tĩnh chỉ để người khác yên tâm. Tôi cũng đang cố hiểu chuyện gì xảy ra.', 'scared'),
-  line('Quân', 'Quân, hai mươi mốt, học luật. An, tôi biết cậu giỏi suy luận. Nhưng nếu cậu kết luận mà chưa đủ căn cứ, tôi sẽ phản đối. Nhất là khi số phận chúng ta nằm trong tay thứ kia.', 'determined'),
-  line('An', 'Yến nhìn tôi như một người không thể sai. Tôi muốn trấn an em, nhưng chính mình cũng đang run. Chúng ta sẽ bảo vệ nhau. Và không ai bị kết tội chỉ vì đang sợ hãi.')
-];
+  line('An', 'Tiếng kính vỡ. Một giọng nói quen thuộc. Rồi trắng xóa. Tôi tỉnh dậy trên sàn phòng trắng; cổ tay bị khóa trong vòng điện tử. Trên màn hình đỏ: ĐỪNG TIN VÀO NHỮNG GÌ CẬU NHỚ.', 'scared'),
+  line('An', 'Đầu đau quá… Cửa ở đâu? Có ai nghe thấy tôi không?'),
+  line('Mai', 'Khoan, đừng đứng dậy vội. Ai bị thương? Tôi không nhìn rõ…'),
+  line('Minh Khoa', 'Đèn đâu rồi? Này, mọi người ở đâu? Đừng đóng cửa!'),
+  line('Hạ Vy', 'Cánh cửa không có tay nắm. Đây là trò gì vậy?'),
+  line('Đức', 'Không ai chạm vào cái vòng. Tôi không biết nó làm gì.'),
+  line('Bảo Linh', 'Màn hình vừa đổi chữ. Đừng chạm vào nó.'),
+  line('Phúc', 'Tường… nó vừa dựng lên từ những ô vuông.'),
+  line('Trâm', 'Nghe tiếng tôi nhé. Thở chậm thôi. Đừng chen về phía cửa.'),
+  line('Quân', 'An, cậu có nhớ mình vào đây bằng cách nào không?'),
+  line('An', 'Không. Chỉ có tiếng kính vỡ và một giọng nói tôi không gọi tên được.'),
+  line('Cyber-M', 'Chào mừng đến với Mê Cung Số. Ta là Cyber-M.'),
+  line('Cyber-M', 'Không ai được trốn sau danh tính giả. Không ai được xóa dấu vết. Không ai được rời đi trước khi sự thật được phán quyết.'),
+  line('Cyber-M', 'Mỗi chương sẽ có một sự cố. Hãy điều tra, thu thập bằng chứng số và tham gia Phiên Tòa Tranh Luận.'),
+  line('Cyber-M', 'Phán quyết sai sẽ khiến hồ sơ cá nhân bị công khai. Người bị kết luận có lỗi sẽ bị đưa vào Kho Lưu Trữ. Sau bảy chương, người sống sót có thể trở về.'),
+  line('Cyber-M', 'Ta đã đọc toàn bộ hồ sơ của các ngươi. Ta biết ai sẽ nói dối, ai sẽ hoảng loạn và ai sẽ phản bội. Đặc biệt là cậu, An.'),
+  line('Cyber-M', 'Ta mong chờ xem thiên tài của chúng ta sẽ phá được bao nhiêu vụ án trước khi trở thành nạn nhân của chính suy luận mình.'),
+  line('Mai', 'Linh, cổ tay chị có bị rách không? Đưa đây tôi xem. Đừng cố tháo vòng, nó đang siết da chị.'),
+  line('Bảo Linh', 'Không sao. Tôi đang nhìn khóa vòng. Không có chốt cơ học nào để mở.'),
+  line('Minh Khoa', 'Ít nhất tôi còn nguyên vẹn. Nếu đây là phòng thoát hiểm thì thiết kế hơi quá tay đấy.'),
+  line('Hạ Vy', 'Cyber-M, ai đặt chúng tôi vào đây? Trả lời cụ thể: cậu kiểm soát những gì?'),
+  line('Cyber-M', 'Ta điều hành mô phỏng. Những câu hỏi còn lại sẽ được trả lời khi các ngươi chứng minh mình xứng đáng.'),
+  line('Đức', 'Lời nói không phải bằng chứng. Cho chúng tôi xem dữ liệu chứng minh có đường về.'),
+  line('Bảo Linh', 'Vòng tay chỉ báo trạng thái khóa. Không có mã nguồn, không có nhà sản xuất. Ghi nhớ điều đó.'),
+  line('Phúc', 'Ánh sáng đổi theo góc nhìn… độ trễ của bóng cũng vậy. Nó là mô phỏng, nhưng mức chi tiết này—'),
+  line('Trâm', 'Phúc, nhìn tôi này. Vy đang run, còn Khoa không thở đều. Ngồi xuống với mọi người đã.'),
+  line('Quân', 'An, đừng để họ gọi cậu là thiên tài rồi chờ cậu cứu tất cả. Nếu suy luận sai, cậu sẽ chịu trách nhiệm chứ?'),
+  line('An', 'Có. Nhưng tôi sẽ không kết luận khi chưa kiểm tra được điều mình thấy.'),
+  line('Yến', 'Anh An? Em nhận ra anh trên TV. Những vụ án anh giúp phá… em từng xem cùng mẹ.'),
+  line('An', 'Đừng tin tôi chỉ vì em nhận ra tôi. Nếu thấy điều gì không khớp, hãy nói ra.'),
+  line('Mai', 'Được rồi, mọi người còn đứng được. Nhưng chúng ta sẽ đi cùng nhau, không ai tự tách nhóm.'),
+  line('Minh Khoa', 'Tôi đồng ý. Chỗ này mà có camera thì ít nhất hãy cho nó thấy chúng ta vẫn biết đùa.'),
+  line('Hạ Vy', 'Tôi sẽ nhớ chính xác những gì Cyber-M vừa hứa. Cậu ta không được phép đổi lời mà không ai nhận ra.'),
+  line('Đức', 'Tôi sẽ xem mọi con số như lời khai: cần chứng từ, cần nguồn.'),
+  line('Bảo Linh', 'Đừng tin một bản ghi chỉ vì nó trông hoàn chỉnh. Phải xem ai tạo ra nó.'),
+  line('Phúc', 'Tôi muốn hiểu cách mô phỏng này hoạt động. Nhưng lần này không chạm vào gì trước khi biết nó làm gì.'),
+  line('Trâm', 'Sợ hãi không khiến ai có lỗi. Chúng ta có thể sợ mà vẫn kiểm tra từng chuyện.'),
+  line('Quân', 'Tôi sẽ chất vấn cậu nếu cậu bỏ qua chứng cứ, An. Kể cả khi cả nhóm muốn nghe một đáp án dễ chịu.'),
+  line('An', 'Vậy thì đừng để ai phải tự quyết định một mình. Chúng ta bắt đầu từ điều có thể kiểm tra.')
+].map(entry => ({ ...entry, scene_c: 'white-room' }));
 
 const plots = [
   {
@@ -61,7 +80,7 @@ const plots = [
   {
     title_c: 'Tài khoản an toàn', category_c: 'Giả mạo cơ quan', victim_c: 'Mai · 20 tuổi', suspect_c: 'Quân', setting_c: 'Ngân hàng mô phỏng', scene_c: 'digital', safety_c: 4,
     hook_c: 'Một cuộc gọi gieo sợ hãi. Một công cụ mở cửa lại khóa đồng đội.',
-    incident_c: [line('Mai', 'Họ biết thông tin gia đình tôi. Họ nói nếu ngắt máy, người thân sẽ bị bắt. Tôi không thở nổi… Tôi chưa cài tệp đó, nhưng tôi đã muốn làm theo.', 'scared'), line('Phúc', 'Cửa giao dịch đóng rồi! Bảng thoát hiểm tắt! Có ai mở được không?', 'scared'), line('Bảo Linh', 'Tệp nằm trên máy tôi không có nghĩa tôi đã chạy nó. Cho tôi kiểm tra thời điểm xuất hiện.'), line('Quân', 'Tôi chỉ muốn mở lối ra. Tôi đã chạy công cụ không xác minh. Tôi không biết nó sẽ nhốt Phúc.', 'scared')],
+     incident_c: [line('Mai', 'Họ biết thông tin gia đình tôi. Họ nói nếu ngắt máy, người thân sẽ bị bắt. Tôi không thở nổi…', 'scared'), line('Phúc', 'Cửa giao dịch đóng rồi! Bảng thoát hiểm tắt! Có ai mở được không?', 'scared'), line('Bảo Linh', 'Có một tệp lạ trên máy tôi. Tôi chưa biết nó liên quan đến cửa hay không.'), line('Quân', 'Đừng nhìn tôi để xin một đáp án. Tôi cũng không biết vì sao Phúc bị nhốt.', 'scared')],
     clues_c: [
       ['Lệnh chạy công cụ', 'Quân khởi động công cụ mở khóa trước báo động.', 'Phiên thao tác Quân → công cụ → cơ chế cách ly.', 'Phân biệt hành động thực hiện với ý định và chủ mưu.'],
       ['Tệp trên máy Linh', 'Không có dấu vết đáng tin cho thấy Linh mở tệp.', 'Thời gian sao chép không trùng thời gian thực thi.', 'Tệp có mặt trên thiết bị chưa chứng minh chủ máy đã chạy.'],
@@ -71,12 +90,12 @@ const plots = [
     ],
     testimony_c: 'Quân: “Tôi gây sự cố, nhưng người tạo tình huống này mới là kẻ lừa đảo.”',
     verdict_c: ['Quân thực hiện lệnh gây cách ly; chưa có căn cứ coi cậu là chủ mưu.', 'Linh là chủ mưu vì tệp nằm trên máy cô.', 'Mai phải chịu toàn bộ trách nhiệm vì tin cuộc gọi.'],
-    aftermath_c: [line('Quân', 'Khoan! Các cậu có biết Kho Lưu Trữ là gì không? Tôi chưa muốn biến mất. An… đừng để họ biến cậu thành thẩm phán chỉ biết nhìn vào kết quả.', 'scared'), line('An', 'Tôi chìa tay nhưng cửa kính đã đóng. Quân gõ vào kính, rồi mất hút. Tôi đã xác định hành động; tôi chưa chứng minh được quyền của hệ thống khi trừng phạt cậu ấy.', 'scared'), line('Mai', 'Tôi vẫn nghe tiếng cậu ấy. Chúng ta không thể coi chuyện này là bình thường.', 'scared'), line('Trâm', 'Câu trong bản ghi cuộc gọi đến từ tài liệu huấn luyện tâm lý Khiên Số. Người dựng bẫy hiểu nỗi sợ của chúng ta.')]
+    aftermath_c: [line('Quân', 'Khoan! Các cậu có biết Kho Lưu Trữ là gì không? Tôi chưa muốn biến mất. An… đừng để họ biến cậu thành thẩm phán chỉ biết nhìn vào kết quả.', 'scared'), line('Quân', '“Cậu luôn cho rằng nếu hiểu đúng bằng chứng, cậu sẽ biết phải kết tội ai. Nhưng có những lúc người gây ra hậu quả cũng là người bị dắt mũi.”', 'scared'), line('Quân', '“Đừng để hắn biến chúng ta thành những thẩm phán chỉ biết nhìn vào kết quả.”', 'scared'), line('An', 'Tôi áp bàn tay lên lớp kính. Quân gõ mạnh vào đó, rồi ánh sáng nuốt lấy cậu. Tôi đã xác định hành động; tôi chưa chứng minh được quyền của hệ thống khi trừng phạt cậu ấy.', 'scared'), line('Mai', 'Tôi vẫn nghe tiếng cậu ấy. Chúng ta không thể coi chuyện này là bình thường.', 'scared'), line('Trâm', 'Câu trong bản ghi cuộc gọi đến từ tài liệu huấn luyện tâm lý Khiên Số. Người dựng bẫy hiểu nỗi sợ của chúng ta.')]
   },
   {
     title_c: 'Lãi suất của niềm tin', category_c: 'Đầu tư và tình cảm', victim_c: 'Đức · 21 tuổi', suspect_c: 'Đức', setting_c: 'Sàn giao dịch mô phỏng', scene_c: 'digital', safety_c: 2,
     hook_c: 'Tiền chung biến mất. Người từng mất tiền chỉ muốn lấy lại điều đã mất.',
-    incident_c: [line('Đức', 'Người đó nói có thể lấy lại khoản tôi mất. Tôi chỉ cần chuyển tín dụng để xác minh quyền sở hữu. Tôi biết đáng ngờ, nhưng tôi đã mất tiền một lần rồi…', 'scared'), line('Minh Khoa', 'Tất cả tín dụng của nhóm bằng không! Chúng ta mua vật phẩm bằng gì? Ai đã chuyển?', 'shocked'), line('An', 'Đức cúi đầu. Sau Quân, mọi người đứng xa nhau hơn. Tôi muốn tìm một thủ phạm ngay để cảm thấy mình còn kiểm soát được. Nhưng cảm giác đó cũng là một cái bẫy.')],
+     incident_c: [line('Đức', 'Tại sao mọi người nhìn tôi? Bảng vừa đổi số, tôi… tôi không hiểu chuyện gì vừa xảy ra.', 'scared'), line('Minh Khoa', 'Tất cả tín dụng của nhóm bằng không! Chúng ta mua vật phẩm bằng gì? Ai đã chuyển?', 'shocked'), line('An', 'Đức cúi đầu. Sau Quân, mọi người đứng xa nhau hơn. Tôi muốn tìm một thủ phạm ngay để cảm thấy mình còn kiểm soát được. Nhưng cảm giác đó cũng là một cái bẫy.')],
     clues_c: [
       ['Lệnh chuyển của Đức', 'Đức xác nhận giao dịch tín dụng chung.', 'Lịch sử chuyển: Đức → tài khoản được chỉ định.', 'Giao dịch chứng minh hành động, không tự chứng minh toàn bộ âm mưu.'],
       ['Lợi nhuận trên màn hình', 'Số dư lớn không có giao dịch tương ứng.', 'Bảng hiển thị lãi; không có tài sản rút được.', 'Ảnh lợi nhuận không thay thế chứng từ.'],
@@ -86,12 +105,12 @@ const plots = [
     ],
     testimony_c: 'Cyber-M: “Đức chuyển tiền. Vậy Đức là kẻ lừa đảo đứng sau mọi chuyện.”',
     verdict_c: ['Đức thực hiện giao dịch gây hại, nhưng chưa chứng minh cậu thiết kế chiến dịch.', 'Đức là chủ mưu của mọi vụ việc.', 'Không ai thực hiện giao dịch vì lợi nhuận chỉ là ảnh.'],
-    aftermath_c: [line('Đức', 'Nếu bị thu hồi… tôi có còn nhớ tên mình không? Đừng nói với mọi người rằng tôi chỉ tham tiền. Tôi đã quá xấu hổ để xin giúp đỡ.', 'scared'), line('An', 'Tôi tin cậu thật sự muốn lấy lại tiền. Kẻ lừa đảo đã dùng chính hy vọng ấy. Tôi sẽ giữ lại cả lời khai của cậu, không chỉ lệnh chuyển.'), line('Trâm', 'An, cậu không cần giả vờ ổn. Chúng ta vừa mất thêm một người.'), line('An', 'Ghế của Đức trống. Mã giao dịch cậu để lại nối hai vụ án. Phá đúng một vụ chưa chắc đã tìm đúng người thực sự chịu trách nhiệm.', 'scared')]
+    aftermath_c: [line('Đức', 'Nếu bị thu hồi… tôi có còn nhớ tên mình không? Đừng nói với mọi người rằng tôi chỉ tham tiền. Tôi đã quá xấu hổ để xin giúp đỡ.', 'scared'), line('Đức', 'An, tôi không muốn đi. Tôi chỉ muốn lấy lại khoản đã mất…', 'scared'), line('An', 'Đức nắm lấy mép cửa khi nó trượt khép lại. Tôi tin cậu thật sự muốn lấy lại tiền. Kẻ lừa đảo đã dùng chính hy vọng ấy.', 'scared'), line('Trâm', 'An, cậu không cần giả vờ ổn. Chúng ta vừa mất thêm một người.'), line('An', 'Ghế của Đức trống. Mã giao dịch cậu để lại nối hai vụ án. Phá đúng một vụ chưa chắc đã tìm đúng người thực sự chịu trách nhiệm.', 'scared')]
   },
   {
     title_c: 'Giọng nói không có chủ', category_c: 'Deepfake và giả giọng', victim_c: 'Trâm · 20 tuổi', suspect_c: 'Hạ Vy', setting_c: 'Căn hộ mô phỏng', scene_c: 'city', safety_c: 5,
     hook_c: 'Một giọng nói quen cầu cứu. Một bản sao che giấu điều gì?',
-    incident_c: [line('Trâm', 'Đó là giọng người thân tôi! Họ nhắc điều chỉ gia đình biết. Nếu tôi không mở vùng bảo mật ngay, họ sẽ gặp nguy hiểm!', 'scared'), line('Hạ Vy', 'Đừng mở! Tôi đã nghe tệp này. Nhưng… tôi không thể kể hết bây giờ.'), line('Mai', 'Cửa bảo mật vừa mở trái phép. Mọi người đừng gửi tiếp bản ghi! Chúng ta chưa biết người trong đó có thật không.', 'shocked'), line('An', 'Một giọng quen thuộc không xác minh được danh tính. Cảm giác “nghe giả” cũng không chứng minh tệp đã bị làm giả. Tôi cần nguồn gốc và lịch sử bản sao.')],
+     incident_c: [line('Trâm', 'Đó là giọng người thân tôi! Họ nhắc điều chỉ gia đình biết. Nếu tôi không mở vùng bảo mật ngay, họ sẽ gặp nguy hiểm!', 'scared'), line('Hạ Vy', 'Đừng mở vội. Tôi không biết giọng nói này là thật hay giả.'), line('Mai', 'Cửa bảo mật vừa mở trái phép. Mọi người đừng gửi tiếp bản ghi! Chúng ta chưa biết người trong đó có thật không.', 'shocked'), line('An', 'Một giọng quen thuộc không xác minh được danh tính. Cảm giác “nghe giả” cũng không chứng minh tệp đã bị làm giả. Tôi cần nguồn gốc và lịch sử bản sao.')],
     clues_c: [
       ['Lịch sử chỉnh sửa của Vy', 'Vy đã sửa bản sao lấy từ kho Khiên Số.', 'Bản sao chỉnh sửa → thông tin đưa cho nhóm.', 'Giữ cả bản gốc và chuỗi chỉnh sửa.'],
       ['Chi tiết gia đình', 'Lời cầu cứu dùng dữ liệu riêng tư.', 'Thông tin đúng xuất hiện trong khảo sát cũ.', 'Biết chuyện riêng không chứng minh người gọi là người thân.'],
@@ -101,12 +120,12 @@ const plots = [
     ],
     testimony_c: 'Cyber-M: “Có tệp âm thanh trong phòng Vy. Chính Vy tạo lời cầu cứu đầu tiên.”',
     verdict_c: ['Vy sửa bản sao và giấu nguồn gây hậu quả; chưa chứng minh tạo lời cầu cứu gốc.', 'Vy tạo bản ghi gốc vì máy cô có tệp.', 'Trâm có lỗi vì nhận ra giọng người thân.'],
-    aftermath_c: [line('Hạ Vy', 'Tôi đã nghĩ mình có thể điều tra một mình. Khi cửa này đóng… xin đừng để nguồn tin của tôi biến mất cùng tôi.', 'scared'), line('An', 'Vy cố giữ giọng bình tĩnh, nhưng bàn tay run trên kính. Tôi nghe câu nói của dịch vụ khôi phục và thấy một người đàn ông sau lớp kính trong ký ức. Tôi từng tin ông ấy.', 'shocked'), line('Mai', 'Chúng ta đang mất từng người. Lần sau, xin đừng giữ bí mật chỉ để bảo vệ nhau.'), line('An', 'Nỗi sợ của tôi không còn chỉ là mất trí nhớ. Nếu người dựng chuyện là người tôi tin nhất, tôi đã trao cho ông ấy bao nhiêu dữ liệu?')]
+    aftermath_c: [line('Hạ Vy', 'Tôi đã nghĩ mình có thể điều tra một mình. Khi cửa này đóng… xin đừng để nguồn tin của tôi biến mất cùng tôi.', 'scared'), line('Hạ Vy', 'Vy kéo lấy khung cửa khi nó khép lại. “Đừng để lời khai của tôi trở thành lời buộc tội cho người khác.”', 'scared'), line('An', 'Vy cố giữ giọng bình tĩnh, nhưng bàn tay run trên kính. Tôi nghe câu nói của dịch vụ khôi phục và thấy một người đàn ông sau lớp kính trong ký ức. Tôi từng tin ông ấy.', 'shocked'), line('Mai', 'Chúng ta đang mất từng người. Lần sau, xin đừng giữ bí mật chỉ để bảo vệ nhau.'), line('An', 'Nỗi sợ của tôi không còn chỉ là mất trí nhớ. Nếu người dựng chuyện là người tôi tin nhất, tôi đã trao cho ông ấy bao nhiêu dữ liệu?')]
   },
   {
     title_c: 'Việc nhẹ, dữ liệu dày', category_c: 'Việc làm giả', victim_c: 'Cả nhóm', suspect_c: 'Phúc', setting_c: 'Văn phòng tuyển dụng', scene_c: 'cafe', safety_c: 3,
     hook_c: 'Lời mời trả công biến thành một hồ sơ về điểm yếu của từng người.',
-    incident_c: [line('Phúc', 'Thông báo này giống email công việc tôi từng nhận: gửi dữ liệu để xác nhận thanh toán. Họ bảo đó chỉ là dữ liệu kỹ thuật đã ẩn danh.'), line('Yến', 'Hồ sơ cá nhân của mọi người trên màn hình! Có phải vì em đăng ký học bổng không? Em không muốn ai bị thu hồi nữa!', 'scared'), line('Bảo Linh', 'Thông tin đến từ nhiều thời điểm, không chỉ Yến. Phải đối chiếu các nguồn trước khi đổ lỗi.'), line('An', 'Cyber-M không chỉ biết tên. Nó biết chúng ta hy vọng gì và sợ mất ai. Các đường dây đang dùng chung một hồ sơ hành vi.')],
+     incident_c: [line('Phúc', 'Tên tôi nằm trên danh sách xuất dữ liệu. Tôi không biết mình đã mở thứ gì cho họ…', 'scared'), line('Yến', 'Hồ sơ cá nhân của mọi người trên màn hình! Có phải vì em đăng ký học bổng không? Em không muốn ai bị thu hồi nữa!', 'scared'), line('Bảo Linh', 'Thông tin đến từ nhiều thời điểm, không chỉ Yến. Phải đối chiếu các nguồn trước khi đổ lỗi.'), line('An', 'Màn hình không chỉ hiện tên. Nó biết những điều riêng tư của chúng ta. Đừng đọc chúng thành tiếng. Ta cần biết ai có thể truy cập dữ liệu ấy.')],
     clues_c: [
       ['Lệnh xuất dữ liệu của Phúc', 'Tài khoản Phúc xuất dữ liệu trước khi rò rỉ.', 'Xuất dữ liệu → bảng công khai.', 'Cần xác minh phạm vi dữ liệu trước khi xử lý.'],
       ['Hồ sơ nhiều nguồn', 'Dữ liệu từ học bổng, khảo sát và báo cáo nạn nhân.', 'Các mốc cung cấp khác nhau của cả nhóm.', 'Không đổ lỗi cho một người vì dữ liệu của họ xuất hiện.'],
@@ -116,12 +135,12 @@ const plots = [
     ],
     testimony_c: 'Phúc: “Tôi xuất dữ liệu. Nhưng tôi không biết họ có thể dùng nó để nhận diện và lừa từng người.”',
     verdict_c: ['Phúc xuất dữ liệu không xác minh; chưa có căn cứ coi cậu thiết kế hồ sơ hành vi.', 'Yến là chủ mưu vì đăng ký học bổng.', 'Phúc vô can với hành động xuất dữ liệu vì tin dữ liệu đã ẩn danh.'],
-    aftermath_c: [line('Phúc', 'Tôi đã tạo trò chơi để người ta vui. Không phải cái này. Linh, giữ bản kê nguồn tôi gửi… Tôi sợ không còn cơ hội sửa sai.', 'scared'), line('An', 'Tôi không hứa điều mình chưa thể biết. Nhưng tôi sẽ tìm các cậu. Không ai đáng bị xóa khỏi sự thật chỉ vì đã mắc sai lầm.'), line('Bảo Linh', 'ASTER. Chính thư mục đã xuất hiện trong nhật ký quản trị đầu tiên. Khiên Số tập hợp chúng ta trước khi Mê Cung Số bắt đầu.'), line('An', 'Tôi thôi tìm một người bạn để quy hết tội lỗi. Tôi bắt đầu nhìn người được lợi khi chúng tôi nghi ngờ nhau.')]
+    aftermath_c: [line('Phúc', 'Tôi đã tạo trò chơi để người ta vui. Không phải cái này. Linh, giữ bản kê nguồn tôi gửi… Tôi sợ không còn cơ hội sửa sai.', 'scared'), line('Phúc', 'Linh, đừng để họ xóa danh mục đó. Tôi không kịp nói với các cậu…', 'scared'), line('An', 'Phúc đập lên cửa, nhưng bàn tay cậu trượt khỏi mặt kính. Tôi không hứa điều mình chưa thể biết. Nhưng tôi sẽ tìm các cậu.'), line('Bảo Linh', 'ASTER. Chính thư mục đã xuất hiện trong nhật ký quản trị đầu tiên. Khiên Số tập hợp chúng ta trước khi Mê Cung Số bắt đầu.'), line('An', 'Tôi thôi tìm một người bạn để quy hết tội lỗi. Tôi bắt đầu nhìn người được lợi khi chúng tôi nghi ngờ nhau.')]
   },
   {
     title_c: 'Phí lấy lại niềm tin', category_c: 'Lừa đảo thu hồi', victim_c: 'Bảo Linh · 21 tuổi', suspect_c: 'Bảo Linh', setting_c: 'Hành lang Kho Lưu Trữ', scene_c: 'digital', safety_c: 5,
     hook_c: 'Tất cả bằng chứng đều hợp lý. Nhưng chỉ một hệ thống kiểm soát tất cả.',
-    incident_c: [line('Bảo Linh', 'Họ nói có thể phục hồi Quân, Đức, Vy và Phúc. Chỉ cần trao khóa bằng chứng. Tôi không muốn các cậu ấy bị xóa. Tôi đã tìm cách truy cập vùng cách ly.', 'scared'), line('Mai', 'Tại sao cậu không nói? Chúng ta có thể cùng kiểm tra. Cậu cũng đang sợ như chúng tôi.'), line('Cyber-M', 'Nhật ký đầy đủ, thời gian thống nhất. Chọn Linh là thủ phạm hoặc chịu hình phạt vì không kết luận.'), line('An', 'Mọi bản ghi đều đi qua Cyber-M. Không có nguồn độc lập để xác minh. Tôi đã nhìn bạn bè bị thu hồi vì những hồ sơ như thế. Lần này tôi sẽ không bỏ phiếu chỉ để giữ an toàn cho mình.')],
+     incident_c: [line('Bảo Linh', 'Màn hình ghi tên tôi. Tôi không thể kiểm tra nhật ký nguồn… An, xin đừng tin bản tóm tắt chỉ vì nó đầy đủ.', 'scared'), line('Mai', 'Tại sao cậu không nói? Chúng ta có thể cùng kiểm tra. Cậu cũng đang sợ như chúng tôi.'), line('An', 'Mọi bản ghi đều đi qua Cyber-M. Không có nguồn độc lập để xác minh. Lần này tôi sẽ không bỏ phiếu chỉ để giữ an toàn cho mình.')],
     clues_c: [
       ['Nguồn nhật ký duy nhất', 'Cyber-M kiểm soát tất cả bản trích xuất.', 'Nguồn tạo, nguồn lưu và bên phán quyết cùng một hệ thống.', 'Nội dung hợp lý không bảo đảm nguồn đáng tin.'],
       ['Lời hứa cứu người', 'Dịch vụ đòi khóa bằng chứng để phục hồi danh tính.', '“Chúng tôi có bản sao của họ. Giao khóa cho chúng tôi.”', 'Không giao khóa, OTP hay quyền truy cập cho dịch vụ chưa xác minh.'],
@@ -170,39 +189,58 @@ const INCIDENT_REACTIONS = [
   [line('Mai', 'Lần này chúng ta cùng làm. Không ai phải đứng trước màn hình đó một mình nữa.', 'determined'), line('Minh Khoa', 'An, chuyện tôi trực tiếp trải qua, tôi sẽ xác nhận. Còn chuyện tôi không biết… tôi sẽ nói rõ là không biết.', 'determined')]
 ];
 
+const QUIET_REMAINDERS = [
+  [
+    line('Mai', 'Tiếng Quân đập vào kính vẫn còn trong đầu tôi. Tôi đã đứng yên trong khi cậu ấy cầu cứu.', 'scared'),
+    line('Trâm', 'Không ai ở đây biết liệu Kho Lưu Trữ có thể mở lại. Chúng ta không thể tin lời Cyber-M, nhưng cũng chưa có cách tự mở cửa.'),
+    line('An', 'Tôi ghi lại từng mốc thay vì tự bào chữa. Lần tới, chúng ta sẽ giữ nguồn chứng cứ và không để nỗi sợ biến thành bản án.')
+  ],
+  [
+    line('Minh Khoa', 'Đức đã cúi đầu trước chúng ta. Tôi cứ nghĩ cậu ấy giấu điều gì vì muốn hại cả nhóm.', 'scared'),
+    line('Mai', 'Tôi giận vì cậu ấy không nói, rồi lại thấy mình cũng chưa từng hỏi vì sao cậu ấy sợ.'),
+    line('An', 'Không ai ở đây còn tin ngay một lời giải thích. Vậy thì từ giờ, ta sẽ hỏi mà không ép ai phải thú nhận.')
+  ],
+  [
+    line('Mai', 'Vy nắm lấy tay tôi qua lớp kính rồi buông ra. Tôi không biết đó là lời tạm biệt hay lời nhờ giúp đỡ.', 'scared'),
+    line('Trâm', 'Chúng ta nghi ngờ cô ấy vì cô ấy giấu nguồn tin. Tôi cũng đã im lặng về khảo sát của mình.'),
+    line('An', 'Tôi sẽ lần theo giọng nói ấy, nhưng không biến ký ức thành bằng chứng. Cả nhóm sẽ kiểm tra cùng nhau.')
+  ],
+  [
+    line('Bảo Linh', 'Phúc đã gửi lại danh mục trước khi cửa đóng. Tôi cứ nhìn dòng “ASTER” và tự hỏi mình đã bỏ sót nó bao lâu.', 'scared'),
+    line('Yến', 'Em từng nghĩ người hiểu công nghệ sẽ biết nơi nào an toàn. Giờ em không biết còn tin được ai.'),
+    line('An', 'Đừng tin chức danh hay vẻ tự tin. Hãy kiểm tra nguồn. Đó là điều chúng ta còn có thể làm cho những người đã bị lấy đi.')
+  ]
+];
+
 export function buildCyberChapters(safety) {
   return plots.map((plot, i) => {
     const base = safety[plot.safety_c];
-    const methods = [
-      ['Mở nội dung gốc và đối chiếu lời khai', 'Coi tên tài khoản là danh tính người thao tác', 'Xóa dữ liệu vì nội dung khiến mọi người hoảng sợ'],
-      ['Đối chiếu nguồn và thời điểm xuất hiện', 'Tin giao diện quen thuộc là đủ', 'Chỉ hỏi người đưa tệp có đáng tin không'],
-      ['Kiểm tra bản ghi nguồn và giới hạn điều nó chứng minh', 'Dùng bản tóm tắt thay bản gốc', 'Kết luận người bị nghi là chủ mưu ngay'],
-      ['Hỏi người liên quan rồi đối chiếu với nguồn khác', 'Ép họ nhận lỗi khi đang sợ hãi', 'Công khai dữ liệu riêng để gây áp lực'],
-      ['Lưu nguồn, liên kết các hồ sơ và kiểm tra quyền truy cập', 'Giao khóa dữ liệu cho người hứa cứu nhóm', 'Chỉ tin trực giác của An']
+    const incidentLeadIns = [
+      'Tại Trung tâm Học bổng, màn hình của Yến chuyển đỏ; cửa khu vực khóa lại.',
+      'Cuộc gọi của Mai vừa ngắt thì ngân hàng tối sầm; cửa giao dịch đỏ lên.',
+      'Bảng tín dụng đóng băng và số dư chung biến mất khỏi màn hình.',
+      'Một tin nhắn cầu cứu vang lên; cửa bảo mật khu căn hộ bật mở.',
+      'Bảng công khai trong văn phòng sáng lên cùng hồ sơ của cả nhóm.',
+      'Cửa Kho Lưu Trữ khóa lại; một danh sách nội bộ hiện trên màn hình.',
+      'Tại quảng trường, Vũ Khải bước tới khi sáu hồ sơ vụ án đồng loạt mở ra.'
     ];
-    const investigate = plot.clues_c.map((clue, index) => ({
-      ...line('An', [
-        `Khoan, ở đây có một dấu vết: ${clue[0]}. Mọi người cho tôi xem nội dung gốc nhé. Chúng ta cần biết nó nói gì trước khi đoán người đứng sau.`,
-        `${clue[0]}… Có điều không khớp. Linh, cùng tôi kiểm tra nguồn và thời điểm xuất hiện được không?`,
-        `Tôi muốn xem kỹ ${clue[0]}. Nó có thể giúp chúng ta, nhưng đừng bắt nó chứng minh nhiều hơn những gì thực sự ghi lại.`,
-        `Còn ${clue[0]}. Tôi muốn nghe người liên quan kể lại trước, rồi mới đối chiếu. Không ai cần trả lời chỉ vì bị ép.`,
-        `${clue[0]} có thể nối vụ này với những gì đã xảy ra. Giữ lại bản gốc nhé. Chúng ta kiểm tra từng bước, không đoán tắt.`
-      ][index], 'suspicious'),
-      investigation_c: index,
-      choices_c: methods[index],
-      clue_c: index,
-      reasoning_c: `${clue[1]} ${clue[3]} Tôi sẽ lưu cả nội dung và nguồn, không biến một dấu vết thành kết luận vượt quá điều nó chứng minh.`
-    }));
+    const incidentDialogue = plot.incident_c;
     return {
       ...base, ...plot, key_c: `cyber-${i + 1}`, number_c: String(i + 1).padStart(2, '0'),
       setting_c: `Mê Cung Số · Khu ${String(i + 1).padStart(2, '0')} · ${plot.setting_c}`,
       scene_c: ['maze-school', 'maze-bank', 'maze-market', 'maze-residence', 'maze-office', 'maze-archive', 'maze-hub'][i],
+      investigation_c: investigationFor(i, plot.clues_c),
+      trial_c: TRIALS[i],
+      required_clues_c: i === 6 ? 2 : 5,
       title_en_c: plot.title_c, short_c: plot.category_c, difficulty_c: i < 2 ? 'Dễ' : i < 5 ? 'Trung Bình' : 'Khó',
       intro_c: plot.incident_c.map(n => n.text_c).join(' '),
       twist_c: plot.aftermath_c.at(-1).text_c,
-      aftermath_c: plot.aftermath_c.flatMap((entry, index) => index === 0 && i >= 1 && i <= 4
-        ? [line('Cyber-M', `Phán quyết đã được ghi nhận. ${plot.suspect_c} sẽ được thu hồi vào Kho Lưu Trữ. Những người còn lại không được can thiệp.`), entry]
-        : [entry]),
+       aftermath_c: [
+         ...plot.aftermath_c.flatMap((entry, index) => index === 0 && i >= 1 && i <= 4
+         ? [line('Cyber-M', `Phán quyết đã được ghi nhận. ${plot.suspect_c} sẽ được thu hồi vào Kho Lưu Trữ. Những người còn lại không được can thiệp.`), entry]
+         : [entry]).map((entry, index, entries) => i === 0 && index === entries.length - 1 ? { ...entry, scene_c: 'maze-dorm' } : entry),
+         ...(i >= 1 && i <= 4 ? QUIET_REMAINDERS[i - 1] : [])
+       ],
       mechanism_c: [plot.incident_c[0].text_c, plot.clues_c[1][1], plot.clues_c[2][3]],
       questions_c: [
         ['Chứng cứ này cho phép kết luận điều gì?', plot.verdict_c[0], plot.verdict_c[1], plot.verdict_c[2]],
@@ -213,17 +251,17 @@ export function buildCyberChapters(safety) {
         : i === 5 ? 'Không trả phí trước hoặc giao mật khẩu, OTP, khóa bằng chứng cho dịch vụ hứa phục hồi. Bảo toàn bản gốc và xác minh nguồn độc lập.'
         : i === 6 ? 'Bàn giao bản gốc và danh mục nguồn để điều tra độc lập; bảo vệ dữ liệu cá nhân, ghi rõ những điểm chưa đủ căn cứ kết luận.' : base.action_c,
       definition_c: `${plot.category_c}: ${plot.hook_c} ${plot.clues_c[0][3]}`,
-      scenes_c: [...(i === 0 ? PROLOGUE : []), plot.incident_c[0],
+      scenes_c: [...(i === 0 ? PROLOGUE : []),
+        line('An', incidentLeadIns[i], 'shocked'),
         { ...line('Cyber-M', INCIDENT_NOTICES[i]), warning_c: true },
-        ...plot.incident_c.slice(1), ...INCIDENT_REACTIONS[i], ...investigate,
-        line('Cyber-M', 'Giai đoạn điều tra kết thúc. Mang những bằng chứng đã thu thập đến Phiên Tòa Tranh Luận. Ta đang chờ kết luận của các ngươi.'),
-        line('An', 'Đã đến lúc đối chiếu lời khai với chứng cứ. Tôi không muốn mất thêm ai. Nhưng nỗi sợ của tôi không được trở thành lý do để kết tội một người khác.', 'determined')]
+        ...incidentDialogue, ...INCIDENT_REACTIONS[i],
+        line('An', 'Chúng ta sẽ tìm chứng cứ tại hiện trường. Không ai phải thú nhận chỉ vì đang sợ; hãy để các bản ghi được kiểm tra trước.', 'determined')]
     };
   });
 }
 
 export const ENDINGS = {
-  true: { title_c: 'Sự thật được xác minh', scene_c: 'city', frames_c: [
+  true: { title_c: 'Sự thật được xác minh', scene_c: 'white-room', frames_c: [
     line('An', 'Danh mục nguồn đã được gửi đến điểm tiếp nhận độc lập. Hệ thống quản trị bị cô lập. Cyber-M mở các vùng lưu trữ. Cánh cửa cuối cùng sáng lên.'),
     line('Mai', 'Họ còn sống! Quân, Đức, Vy, Phúc… tất cả được tìm thấy. Chúng ta thực sự ra ngoài rồi!', 'happy'),
     line('An', 'Tôi tỉnh trong cơ sở y tế. Khi nhìn đủ mười người, tôi mới thở ra. Lần đầu tiên, nhẹ nhõm không đến từ việc mình đoán đúng, mà từ việc không ai phải bị bỏ lại.', 'happy'),
@@ -231,13 +269,13 @@ export const ENDINGS = {
     line('An', 'Không. Bàn giao bản gốc, lập danh mục nguồn, giữ bản sao được kiểm soát. Tôi đã học rằng phá án không phải chứng minh mình thông minh hơn người khác.', 'happy'),
     line('An', 'Mạng Nhện chưa biến mất sau một đêm. Vũ Khải bị truy tìm; mọi chứng cứ vẫn phải được xác minh theo quy trình. Nếu một Cyber-M khác xuất hiện, tôi sẽ hỏi ai điều khiển nó, dữ liệu từ đâu, và ai có quyền kiểm tra.')
   ] },
-  normal: { title_c: 'Bản án chưa hoàn tất', scene_c: 'school', frames_c: [
+  normal: { title_c: 'Bản án chưa hoàn tất', scene_c: 'maze-hub', frames_c: [
     line('An', 'Chúng tôi xác định được Khải, nhưng chuỗi nguồn độc lập còn thiếu. Nhóm thoát khỏi mô phỏng; dữ liệu quan trọng vẫn nằm ngoài tầm kiểm soát.'),
     line('Yến', 'Em mừng vì nhìn thấy bầu trời thật. Nhưng những người khác ngoài kia có còn nhận tin nhắn từ hệ thống ấy không?', 'scared'),
     line('An', 'Tôi không nói vụ án đã xong chỉ để mọi người yên tâm. Tôi bàn giao những gì có thể kiểm tra, ghi rõ phần chưa xác minh. Chúng tôi sẽ tiếp tục cùng nhau.'),
-    line('An', 'Mạng Nhện bị tổn thương, chưa bị bóc gỡ. Niềm tin không thể trở lại bằng một lời hứa. Hãy chơi lại các chương, tìm đủ chứng cứ và giữ chuỗi nguồn để mở kết thúc chính.')
+    line('An', 'Mạng Nhện bị tổn thương, chưa bị bóc gỡ. Chương bảy còn thiếu các nguồn độc lập của Mai và Khoa, Trâm hoặc Yến; kết luận về Khải vẫn cần được kiểm chứng bằng chuỗi chứng cứ đầy đủ.')
   ] },
-  bad: { title_c: 'Phán quyết của Cyber-M', scene_c: 'digital', frames_c: [
+  bad: { title_c: 'Phán quyết của Cyber-M', scene_c: 'court', frames_c: [
     line('Cyber-M', 'Linh đã bị kết tội. Các ngươi đã chọn bản tóm tắt của ta thay cho quyền kiểm tra nguồn. Ta không cần ra lệnh: con người tự hoàn thành phần còn lại.'),
     line('Bảo Linh', 'An… đừng để lời khai của tôi biến mất. Tôi đã cố cứu họ. Tôi sợ, nhưng tôi không tạo ra chuyện này.', 'scared'),
     line('An', 'Cánh cửa đóng. Tôi nhận ra quá muộn: tôi đã gọi một phán quyết không được kiểm tra là sự thật. Chiến dịch thao túng ngoài kia lại bắt đầu.', 'scared'),

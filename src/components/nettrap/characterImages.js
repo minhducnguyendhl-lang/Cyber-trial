@@ -3,6 +3,9 @@ import { toast } from 'sonner';
 const databaseName = 'cyber-m-character-art';
 const listeners = new Set();
 const images = new Map();
+const builtInImages = {
+  An: { key_c: 'An', name_c: 'An', url_c: '/characters/an.png', built_in_c: true }
+};
 let loading;
 let backgroundRemover;
 
@@ -71,7 +74,7 @@ export function loadCharacterImages() {
   return loading;
 }
 
-export function getCharacterImage(name) { return images.get(name); }
+export function getCharacterImage(name) { return images.get(name) || builtInImages[name]; }
 export function subscribeCharacterImages(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);

@@ -65,11 +65,17 @@ export default function Gallery() {
     setSelected(unlockedIndices[(position + direction + unlockedIndices.length) % unlockedIndices.length]);
     setZoom(1);
   }
-  function downloadArt() {
+  async function downloadArt() {
     try {
       const original = tab === 'characters' && getCharacterImage(item?.portrait_c);
-      if (original) {
+      if (original?.file_c) {
         downloadBlob(original.file_c, original.file_c.name);
+        return;
+      }
+      if (original?.built_in_c) {
+        const response = await fetch(original.url_c);
+        if (!response.ok) throw new Error('Không tải được ảnh nhân vật.');
+        downloadBlob(await response.blob(), 'an.png');
         return;
       }
       const svg = imageRef.current?.querySelector('svg');
