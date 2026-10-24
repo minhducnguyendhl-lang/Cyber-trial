@@ -5,16 +5,16 @@ const listeners = new Set();
 const images = new Map();
 const builtInImages = {
   'An': { key_c: 'An', name_c: 'An', url_c: '/characters/an.png', built_in_c: true },
-  'Bảo Linh': { key_c: 'Bảo Linh', name_c: 'Bảo Linh', url_c: '/characters/bao-linh.png', built_in_c: true },
-  'Phúc': { key_c: 'Phúc', name_c: 'Phúc', url_c: '/characters/phuc.png', built_in_c: true },
-  ' Đức': { key_c: ' Đức', name_c: ' Đức', url_c: '/characters/duc.png', built_in_c: true },
-  'Hạ Vy': { key_c: 'Hạ Vy', name_c: 'Hạ Vy', url_c: '/characters/ha-vy.png', built_in_c: true },
-  'Mai': { key_c: 'Mai', name_c: 'Mai', url_c: '/characters/mai.png', built_in_c: true },
-  'Minh Khoa': { key_c: 'Minh Khoa', name_c: 'Minh Khoa', url_c: '/characters/minh-khoa.png', built_in_c: true },
-  'Quân': { key_c: 'Quân', name_c: 'Quân', url_c: '/characters/quan.png', built_in_c: true },
-  'Trâm': { key_c: 'Trâm', name_c: 'Trâm', url_c: '/characters/tram.png', built_in_c: true },
-  'Vũ Khải': { key_c: 'Vũ Khải', name_c: 'Vũ Khải', url_c: '/characters/vu-khai.png', built_in_c: true },
-  'Yến': { key_c: 'Yến', name_c: 'Yến', url_c: '/characters/yen.png', built_in_c: true }
+  'Bảo Linh': { key_c: 'Bảo Linh', name_c: 'Bảo Linh', url_c: '/characters/Bảo Linh.png', built_in_c: true },
+  'Phúc': { key_c: 'Phúc', name_c: 'Phúc', url_c: '/characters/Phúc.png', built_in_c: true },
+  ' Đức': { key_c: ' Đức', name_c: ' Đức', url_c: '/characters/Đức.png', built_in_c: true },
+  'Hạ Vy': { key_c: 'Hạ Vy', name_c: 'Hạ Vy', url_c: '/characters/Hạ Vy.png', built_in_c: true },
+  'Mai': { key_c: 'Mai', name_c: 'Mai', url_c: '/characters/Mai.png', built_in_c: true },
+  'Minh Khoa': { key_c: 'Minh Khoa', name_c: 'Minh Khoa', url_c: '/characters/Minh Khoa.png', built_in_c: true },
+  'Quân': { key_c: 'Quân', name_c: 'Quân', url_c: '/characters/Quân.png', built_in_c: true },
+  'Trâm': { key_c: 'Trâm', name_c: 'Trâm', url_c: '/characters/Trâm.png', built_in_c: true },
+  'Vũ Khải': { key_c: 'Vũ Khải', name_c: 'Vũ Khải', url_c: '/characters/Vũ Khải.png', built_in_c: true },
+  'Yến': { key_c: 'Yến', name_c: 'Yến', url_c: '/characters/Yến.png', built_in_c: true }
 };
 let loading;
 let backgroundRemover;
