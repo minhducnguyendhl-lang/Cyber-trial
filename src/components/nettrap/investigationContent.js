@@ -184,12 +184,12 @@ const SPEAKERS = [
   ['An', 'Bảo Linh', 'Mai', 'Trâm', 'Yến']
 ];
 
-const AFTER_DIALOGUE = {
-  '1:3': 'Quân: “Tôi đã chạy công cụ. Tôi muốn mở cửa, nhưng đáng lẽ phải kiểm tra nó trước. Tôi không biết nó sẽ nhốt Phúc.”',
-  '1:4': 'Trâm: “Câu đó có trong tài liệu Khiên Số. Tôi nhận ra giọng điệu ấy từ buổi khảo sát, nhưng lúc này mới có bản ghi để đối chiếu.”',
-  '2:3': 'Đức: “Tôi đã chuyển tín dụng. Tôi tin lời hứa lấy lại khoản đầu tư, rồi xấu hổ nên không nói. Tôi không biết họ dựng số dư giả.”',
-  '3:3': 'Hạ Vy: “Tôi đã sửa bản sao và giấu nguồn. Tôi muốn người điều hành lộ diện; tôi không tạo tệp gốc.”',
-  '5:3': 'Bảo Linh: “Tôi dùng quyền khẩn cấp để tìm đường cứu các bạn. Tôi đã sợ quyền đó bị dùng để buộc tội mình.”'
+const TASK_DISCLOSURES = {
+  '1:3': ['Quân: “Tôi đã chạy công cụ. Tôi muốn mở cửa cho cả nhóm, nhưng lẽ ra phải kiểm tra nó trước.”', 'An: “Nhật ký xác nhận hành động của cậu, không chứng minh cậu tạo ra cuộc gọi đe dọa Mai.”'],
+  '2:3': ['Đức: “Tôi đã chuyển tín dụng. Tôi tin họ có thể lấy lại khoản đầu tư rồi xấu hổ nên im lặng.”', 'Đức: “Tôi không biết số dư họ đưa ra là giả. Tôi chỉ muốn lấy lại những gì đã mất.”'],
+  '3:3': ['Hạ Vy: “Tôi sửa bản sao và giấu nguồn để theo dấu người điều hành.”', 'Hạ Vy: “Tôi không tạo bản ghi đầu tiên. Tôi biết đáng lẽ phải nói sớm hơn.”'],
+  '4:3': ['Phúc: “Tôi đã xuất dữ liệu trước khi xác minh bên thuê. Họ nói đó chỉ là thông tin kỹ thuật.”', 'Phúc: “Tôi không biết hồ sơ ấy có thể nhận diện từng người. Tôi đã không kiểm tra hợp đồng.”'],
+  '5:3': ['Bảo Linh: “Tôi đã dùng quyền khẩn cấp để tìm đường cứu các bạn.”', 'Bảo Linh: “Tôi sợ quyền truy cập ấy sẽ bị dùng để buộc tội mình, nên đã im lặng.”']
 };
 
 export function investigationFor(chapterIndex, clues) {
@@ -198,8 +198,12 @@ export function investigationFor(chapterIndex, clues) {
     clue_index_c: index,
     clue_c: clues[index],
     speaker_c: SPEAKERS[chapterIndex][index],
-    dialogue_before_c: `${SPEAKERS[chapterIndex][index]}: “${task.prompt_c}”`,
-    dialogue_after_c: AFTER_DIALOGUE[`${chapterIndex}:${index}`] || `${SPEAKERS[chapterIndex][index]}: “${clues[index][1]}”`,
+    dialogue_before_c: chapterIndex === 0 && index === 2
+      ? ['Bảo Linh: “Tôi sẽ mượn máy cho cậu, nhưng đừng mở hay ghi đè dữ liệu gốc.”', 'Yến: “Trong điện thoại có tất cả tin nhắn của em… nếu họ lấy được thì sao?”', 'Minh Khoa: “Tên tài khoản là của tôi, nhưng đừng nhìn tôi như thể tôi đã gửi nó.”']
+      : [`${SPEAKERS[chapterIndex][index]}: “${task.prompt_c}”`, `An: “Ta sẽ ghi lại nguồn và kiểm tra chi tiết trước khi kết luận.”`],
+    dialogue_after_c: chapterIndex === 0 && index === 2
+      ? ['Bảo Linh: “Giờ gửi lệch khỏi phiên của Khoa; trường hash trống nghĩa là bản tóm tắt do hệ thống tạo.”', 'Minh Khoa: “Tôi không gửi nó. Tôi đã mất quyền vào tài khoản sau một lời mời hợp tác giả… tôi xấu hổ nên không nói.”']
+      : TASK_DISCLOSURES[`${chapterIndex}:${index}`] || [`${SPEAKERS[chapterIndex][index]}: “${clues[index][1]}”`, `An: “${clues[index][3]}”`],
     required_c: chapterIndex !== 6 || index < 2,
     optional_c: chapterIndex === 6 && index >= 2
   }));
