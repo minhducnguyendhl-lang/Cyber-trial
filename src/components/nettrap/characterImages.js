@@ -14,7 +14,8 @@ const builtInImages = {
   'Quân': { key_c: 'Quân', name_c: 'Quân', url_c: '/characters/Quân.png', built_in_c: true },
   'Trâm': { key_c: 'Trâm', name_c: 'Trâm', url_c: '/characters/Trâm.png', built_in_c: true },
   'Vũ Khải': { key_c: 'Vũ Khải', name_c: 'Vũ Khải', url_c: '/characters/Vũ Khải.png', built_in_c: true },
-  'Yến': { key_c: 'Yến', name_c: 'Yến', url_c: '/characters/Yến.png', built_in_c: true }
+  'Yến': { key_c: 'Yến', name_c: 'Yến', url_c: '/characters/Yến.png', built_in_c: true },
+  'Cyber-M': { key_c: 'Cyber-M', name_c: 'Cyber-M', url_c: '/characters/Cyber-M.png', built_in_c: true }
 };
 let loading;
 let backgroundRemover;
