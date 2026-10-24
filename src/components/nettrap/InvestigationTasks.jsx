@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 function EvidenceViewer({ task, onComplete }) {
   return <div className="mt-4 border border-primary/40 bg-secondary p-4" aria-live="polite">
-    <p className="mb-2 font-heading text-lg font-bold text-primary">Dữ liệu đã trích xuất</p>
+    <p className="mb-2 font-heading text-lg font-bold text-primary">{task.type_c === 'confront' ? 'Lời thừa nhận được ghi lại' : 'Dữ liệu đã trích xuất'}</p>
     <p className="text-sm leading-relaxed">{task.artifact_c}</p>
     <div className="mt-3 space-y-1 border-l-2 border-primary pl-3 text-sm">{task.dialogue_after_c?.map((line, index) => <p key={index}>{line}</p>)}</div>
     <Button onClick={onComplete} className="mt-4 min-h-11 w-full font-bold">Lưu manh mối · {task.clue_c[0]}<ApperIcon name="Pin" className="ml-2 h-4 w-4"/></Button>
@@ -15,40 +15,103 @@ function Hint({ children }) {
   return children ? <p role="status" className="mt-3 border-l-2 border-warning bg-muted px-3 py-2 text-sm leading-relaxed text-muted-foreground">{children}</p> : null;
 }
 
+function InspectFrame({ task, renderSegments }) {
+  const { frame_c: frame, header_c: header } = task;
+  if (frame === 'sms') return <div className="mx-auto max-w-md rounded-[2rem] border-[8px] border-foreground/80 bg-background p-4 shadow-lg">
+    <div className="mb-4 flex items-center justify-between border-b border-border pb-2 font-mono text-xs"><span>09:41 · LTE</span><span>●●●</span></div>
+    <div className="mb-4 flex items-center gap-3 border-b border-border pb-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-secondary font-bold text-primary">S</span><div><b className="block">{header.from_c}</b><span className="text-xs text-muted-foreground">Tin nhắn SMS · {header.time_c}</span></div></div>
+    <div className="ml-auto max-w-[92%] rounded-2xl rounded-tr-sm bg-secondary p-3 text-sm leading-relaxed"><p className="whitespace-pre-line">{renderSegments(task.body_c, 'body')}</p><p className="mt-2 text-right text-[10px] text-muted-foreground">{header.time_c}</p></div>
+  </div>;
+  if (frame === 'browser') return <div className="mx-auto max-w-2xl overflow-hidden rounded border border-border bg-background shadow-lg">
+    <div className="flex items-center gap-2 border-b border-border bg-muted px-3 py-2"><span className="h-2 w-2 rounded-full bg-destructive"/><span className="h-2 w-2 rounded-full bg-warning"/><span className="h-2 w-2 rounded-full bg-success"/><span className="ml-3 text-xs text-muted-foreground">Cổng học bổng · trình duyệt</span></div>
+    <div className="border-b border-border p-3"><div className="rounded-full border border-warning bg-warning/10 px-3 py-2 font-mono text-xs sm:text-sm" aria-label="Địa chỉ trang web">{renderSegments(header.url_c, 'url')}</div></div>
+    <div className="p-4 sm:p-6"><p className="mb-4 text-lg font-bold text-primary">Cổng xét duyệt học bổng</p><p className="whitespace-pre-line text-sm leading-relaxed">{renderSegments(task.body_c, 'body')}</p>
+      <div className="mt-4 grid gap-2 border-t border-border pt-4 sm:grid-cols-2"><input aria-label="Email đăng ký" placeholder="Email đăng ký" disabled className="border border-border bg-muted/30 px-3 py-2 text-sm"/><input aria-label="Mật khẩu và OTP" placeholder="Mật khẩu ngân hàng / OTP" disabled className="border border-warning bg-warning/5 px-3 py-2 text-sm"/></div>
+      <button type="button" disabled className="mt-3 min-h-10 w-full bg-primary/80 text-sm font-bold text-primary-foreground">Xác minh hồ sơ</button>
+    </div>
+  </div>;
+  if (frame === 'call') return <div className="mx-auto max-w-md rounded-[2rem] border-[8px] border-foreground/80 bg-background p-4 shadow-lg">
+    <div className="mb-4 border-b border-border pb-3 text-center"><p className="text-xs uppercase tracking-widest text-muted-foreground">Nhật ký cuộc gọi</p><p className="mt-2 text-lg font-bold">{header.caller_c}</p><p className="text-sm text-muted-foreground">Đến · {header.duration_c}</p></div>
+    <div className="rounded-xl border border-border bg-muted/30 p-4"><p className="mb-2 text-xs font-bold text-primary">BẢN GHI CUỘC GỌI</p><p className="whitespace-pre-line text-sm leading-relaxed">{renderSegments(task.body_c, 'body')}</p></div>
+    <div className="mt-3 flex items-center gap-3 border border-border p-3"><ApperIcon name="Paperclip" className="h-5 w-5 text-primary"/><span><b className="block text-sm">{header.attachment_c}</b><span className="text-xs text-muted-foreground">Tệp đính kèm · chưa mở</span></span></div>
+  </div>;
+  if (frame === 'email') return <div className="mx-auto max-w-2xl border border-border bg-background shadow-lg">
+    <div className="border-b border-border bg-muted/50 p-4"><p className="text-xs font-bold uppercase tracking-widest text-primary">Hộp thư · thư đã lưu</p><h3 className="mt-2 font-heading text-lg font-bold">{header.subject_c}</h3><dl className="mt-3 grid gap-1 text-xs sm:grid-cols-[auto_1fr]"><dt className="text-muted-foreground">Từ</dt><dd>{header.from_c}</dd><dt className="text-muted-foreground">Đến</dt><dd>{header.to_c}</dd></dl></div>
+    <div className="p-4 sm:p-6"><p className="whitespace-pre-line text-sm leading-relaxed">{renderSegments(task.body_c, 'body')}</p><p className="mt-5 border-t border-border pt-3 text-xs text-muted-foreground">Bản email được lưu · chưa xác minh chữ ký số</p></div>
+  </div>;
+  if (frame === 'chat') return <div className="mx-auto max-w-lg overflow-hidden rounded-xl border border-border bg-background shadow-lg">
+    <div className="border-b border-border bg-secondary/60 p-3"><p className="font-bold">{header.room_c}</p><p className="text-xs text-muted-foreground">{header.from_c} · {header.time_c}</p></div>
+    <div className="min-h-40 bg-muted/20 p-4"><div className="max-w-[92%] rounded-2xl rounded-tl-sm border border-border bg-background p-3 text-sm leading-relaxed"><p className="whitespace-pre-line">{renderSegments(task.body_c, 'body')}</p></div><p className="mt-2 text-right text-[10px] text-muted-foreground">{header.time_c} · đã chuyển tiếp</p></div>
+  </div>;
+  if (frame === 'dashboard') return <div className="mx-auto max-w-2xl border border-border bg-background shadow-lg">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/50 p-4"><div><p className="text-xs uppercase tracking-widest text-primary">ASTER · Bảng dữ liệu</p><h3 className="font-heading font-bold">{header.title_c}</h3></div><span className="font-mono text-[10px] text-muted-foreground">{header.updated_c}</span></div>
+    <div className="grid gap-3 p-4 sm:grid-cols-[7rem_1fr]"><nav className="hidden border-r border-border pr-3 text-xs text-muted-foreground sm:block">Tổng quan<br/><br/>Hồ sơ<br/><br/>Nguồn xuất</nav><div className="grid gap-3"><div className="grid grid-cols-3 gap-2"><span className="border border-border p-2 text-[10px]">Hồ sơ<br/><b>216</b></span><span className="border border-border p-2 text-[10px]">Nguồn<br/><b>03</b></span><span className="border border-border p-2 text-[10px]">Trạng thái<br/><b>Đã xuất</b></span></div><p className="whitespace-pre-line border border-border bg-muted/20 p-3 text-sm leading-relaxed">{renderSegments(task.body_c, 'body')}</p></div></div>
+  </div>;
+  if (frame === 'notice') return <div className="mx-auto max-w-xl border border-border bg-[#f7f4e9] p-4 text-slate-900 shadow-lg sm:p-6">
+    <div className="border-b-2 border-slate-700 pb-3 text-center"><p className="text-xs font-bold uppercase tracking-widest">THÔNG BÁO / BẢN LƯU</p><p className="mt-1 font-mono text-xs">{header.issuer_c}</p><p className="mt-1 text-[10px]">{header.issued_c} · Mã: {header.reference_c}</p></div>
+    <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">{renderSegments(task.body_c, 'body')}</p>
+    <div className="mt-5 border-t border-slate-400 pt-2 text-right text-[10px]">Bản sao · chưa xác thực chữ ký</div>
+  </div>;
+  return <div className="mx-auto max-w-xl border-[8px] border-foreground/80 bg-background p-3 shadow-lg">
+    <div className="mb-3 flex items-center justify-between border-b border-border pb-2 font-mono text-xs"><span>{header.device_c}</span><span>{header.captured_c}</span></div>
+    <div className="border border-border bg-muted/20 p-3"><div className="mb-3 flex items-center justify-between text-xs"><b>{header.filename_c}</b><span>⋮</span></div><p className="whitespace-pre-line text-sm leading-relaxed">{renderSegments(task.body_c, 'body')}</p></div>
+  </div>;
+}
+
 function InspectTask({ task, onComplete }) {
   const [selected, setSelected] = useState([]);
-  const [hint, setHint] = useState('');
-  const done = task.targets_c.every(index => selected.includes(index));
-  function inspect(index) {
-    if (task.targets_c.includes(index)) {
-      setSelected(items => items.includes(index) ? items : [...items, index]);
-      setHint('');
-    } else setHint(task.hint_c);
+  const [feedback, setFeedback] = useState('');
+  const urlSegments = Array.isArray(task.header_c.url_c) ? task.header_c.url_c : [];
+  const bodySegments = task.body_c;
+  const suspicious = [
+    ...urlSegments.map((segment, index) => ({ id: `url-${index}`, segment })),
+    ...bodySegments.map((segment, index) => ({ id: `body-${index}`, segment }))
+  ].filter(item => typeof item.segment !== 'string' && item.segment.bad);
+  const done = suspicious.length > 0 && suspicious.every(item => selected.includes(item.id));
+  function inspect(id, segment) {
+    setFeedback(`${task.speaker_c}: “${segment.note}”`);
+    if (segment.bad) setSelected(items => items.includes(id) ? items : [...items, id]);
   }
-  const browser = /trang|web|dashboard|học bổng/i.test(task.title_c);
-  const phone = /sms|tin nhắn|cuộc gọi|điện thoại|thông điệp/i.test(task.title_c);
-  const domain = task.items_c[1] || 'portal.example';
-  const formalRecord = /hợp đồng|email|dashboard|bảng điều khiển/i.test(task.title_c);
+  function renderSegments(segments, prefix) {
+    return segments.map((segment, index) => {
+      if (typeof segment === 'string') return segment;
+      const id = `${prefix}-${index}`;
+      return <button key={id} type="button" aria-pressed={selected.includes(id)} onClick={() => inspect(id, segment)}
+        className={`game-focus inline rounded px-0.5 text-left underline decoration-dotted ${selected.includes(id) ? 'bg-primary/20 text-primary' : segment.bad ? 'decoration-warning hover:bg-warning/10' : 'decoration-muted-foreground hover:bg-muted'}`}>
+        {segment.t}{selected.includes(id) && <span aria-hidden="true" className="ml-1 text-[10px]">✓</span>}
+      </button>;
+    });
+  }
   return <div>
-    <p className="mb-3 text-sm text-muted-foreground">Đọc bản gốc rồi chạm vào những cụm đáng ngờ ngay trong vật chứng. Chi tiết bình thường vẫn có thể được kiểm tra.</p>
-    <div className={`mx-auto max-w-xl border-[8px] border-foreground/80 bg-background p-3 shadow-lg ${phone ? 'rounded-[2rem]' : ''}`}>
-      <div className="mb-3 flex items-center justify-between border-b border-border pb-2 font-mono text-xs"><span>{browser ? 'TRÌNH DUYỆT · KẾT NỐI KHÔNG XÁC MINH' : phone ? 'TIN NHẮN · THIẾT BỊ GỐC' : 'HỒ SƠ · BẢN ĐÃ THU THẬP'}</span><span>{task.items_c[0]?.match(/\d\d:\d\d/)?.[0] || '23:41'}</span></div>
-      {browser && <div className="mb-3 rounded border border-warning bg-warning/10 px-3 py-2 font-mono text-sm"><span className="text-muted-foreground">https://</span>{domain.split('').map((character, index) => <button key={`${character}-${index}`} type="button" aria-label={`Ký tự ${character} trong tên miền`} onClick={() => inspect(1)} className={selected.includes(1) ? 'bg-primary/20 text-primary' : 'underline decoration-warning'}>{character}</button>)}</div>}
-      {phone && <p className="mb-2 text-xs text-muted-foreground">Người gửi: {task.hotspot_c} · Thiết bị: Android · đã nhận</p>}
-      {formalRecord && <div className="mb-3 grid gap-1 border border-border bg-muted/30 p-2 font-mono text-xs"><span>NGƯỜI GỬI / ĐƠN VỊ: Không xác minh</span><span>CHỦ ĐỀ: Yêu cầu xác nhận dữ liệu</span><span>TRẠNG THÁI: Chờ phê duyệt · không có nguồn ký</span></div>}
-      <div className={`mb-3 border border-border p-3 ${phone ? 'rounded-2xl bg-secondary/60' : 'bg-muted/40'}`}>
-        <p className="mb-2 text-xs font-bold text-primary">{browser ? 'BIỂU MẪU / HỒ SƠ' : phone ? 'NỘI DUNG TIN NHẮN · 23:41' : task.title_c}</p>
-        <p className="mb-3 leading-relaxed">{task.prompt_c}</p>
-        {browser && <div className="mb-3 grid gap-2 sm:grid-cols-2"><input aria-label="Trường email" placeholder="Email đăng ký" disabled className="border border-border bg-background px-2 py-2 text-sm"/><input aria-label="Trường OTP" placeholder="Mật khẩu / OTP" disabled className="border border-warning bg-background px-2 py-2 text-sm"/></div>}
-        <p className="flex flex-wrap gap-1 leading-relaxed">{task.items_c.map((item, index) => <button key={item} type="button" onClick={() => inspect(index)} aria-pressed={selected.includes(index)}
-          className={`game-focus rounded px-1 py-0.5 text-left text-sm ${selected.includes(index) ? 'bg-primary/20 text-primary' : 'underline decoration-dotted decoration-muted-foreground hover:bg-muted'}`}>
-          {item}{selected.includes(index) && <span className="ml-1 text-[10px]">✓</span>}
-        </button>)}</p>
-      </div>
-      {!phone && <div className="flex items-center justify-between text-[10px] text-muted-foreground"><span>Chi tiết không được sửa · Bản gốc giữ nguyên</span><span>Kiểm tra nguồn ⌕</span></div>}
-    </div>
-    <Hint>{hint}</Hint>
+    <p className="mb-3 text-sm text-muted-foreground">{task.prompt_c}</p>
+    <InspectFrame task={task} renderSegments={renderSegments}/>
+    <Hint>{feedback}</Hint>
     {done && <EvidenceViewer task={task} onComplete={onComplete}/>}
+  </div>;
+}
+
+function ConfrontTask({ task, chapterTasks, collectedClues, onComplete }) {
+  const [feedback, setFeedback] = useState('');
+  const [revealed, setRevealed] = useState(false);
+  const evidence = chapterTasks.filter(item => collectedClues.includes(item.clue_index_c));
+  function present(index) {
+    if (index === task.present_clue_c) {
+      setRevealed(true);
+      setFeedback('');
+      return;
+    }
+    setRevealed(false);
+    setFeedback(task.deflection_c);
+  }
+  return <div>
+    <p className="mb-3 text-sm text-muted-foreground">{task.prompt_c}</p>
+    <p className="mb-2 text-sm font-semibold">Chọn một vật chứng đã thu thập để đối chất:</p>
+    <div className="grid gap-2 sm:grid-cols-2">{evidence.map(item => <button key={item.clue_index_c} type="button" onClick={() => present(item.clue_index_c)} className="game-focus border border-border bg-background p-3 text-left hover:bg-muted">
+      <b className="block text-primary">{item.clue_c[0]}</b><span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{item.clue_c[2]}</span>
+    </button>)}</div>
+    {!evidence.length && <Hint>Chưa có vật chứng nào để trình bày.</Hint>}
+    <Hint>{feedback}</Hint>
+    {revealed && <EvidenceViewer task={task} onComplete={onComplete}/>}
   </div>;
 }
 
@@ -200,8 +263,9 @@ function AudioTask({ task, onComplete }) {
   </div>;
 }
 
-export default function InvestigationTask({ task, onComplete }) {
+export default function InvestigationTask({ task, onComplete, chapterTasks = [], collectedClues = [] }) {
   if (task.type_c === 'inspect') return <InspectTask task={task} onComplete={onComplete}/>;
+  if (task.type_c === 'confront') return <ConfrontTask task={task} chapterTasks={chapterTasks} collectedClues={collectedClues} onComplete={onComplete}/>;
   if (task.type_c === 'compare') return <CompareTask task={task} onComplete={onComplete}/>;
   if (task.type_c === 'search') return <SearchTask task={task} onComplete={onComplete}/>;
   if (task.type_c === 'connect') return <ConnectTask task={task} onComplete={onComplete}/>;
