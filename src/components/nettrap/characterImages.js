@@ -117,11 +117,19 @@ export async function saveCharacterImage(key, file) {
   }
 }
 
-export function characterName(name) { return images.get(name)?.name_c || name; }
 export function characterText(text = '') {
   let result = text;
-  [...images.entries()].sort(([a], [b]) => b.length - a.length).forEach(([key, row]) => {
-    result = result.replace(new RegExp(`(^|[^\\p{L}])${key}(?=$|[^\\p{L}])`, 'gu'), (_, prefix) => `${prefix}${row.name_c}`);
+  // Hợp nhất cả ảnh tùy chỉnh trong IndexedDB lẫn ảnh mặc định builtInImages
+  const allEntries = [
+    ...Object.entries(builtInImages),
+    ...images.entries()
+  ];
+
+  allEntries.sort(([a], [b]) => b.length - a.length).forEach(([key, row]) => {
+    // Escape ký tự gạch ngang '-' trong key 'Cyber-M' để Regex không bị lỗi
+    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    result = result.replace(new RegExp(`(^|[^\\p{L}])${escapedKey}(?=$|[^\\p{L}])`, 'gu'), (_, prefix) => `${prefix}${row.name_c}`);
   });
+
   return result;
 }
