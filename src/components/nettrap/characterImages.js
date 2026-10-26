@@ -7,7 +7,7 @@ const builtInImages = {
   'An': { key_c: 'An', name_c: 'An', url_c: '/characters/an.png', built_in_c: true },
   'Bảo Linh': { key_c: 'Bảo Linh', name_c: 'Bảo Linh', url_c: '/characters/Bảo Linh.png', built_in_c: true },
   'Phúc': { key_c: 'Phúc', name_c: 'Phúc', url_c: '/characters/Phúc.png', built_in_c: true },
-  'Đức': { key_c: 'Đức', name_c: ' Đức', url_c: '/characters/Đức.png', built_in_c: true },
+  'Đức': { key_c: 'Đức', name_c: 'Đức', url_c: '/characters/Đức.png', built_in_c: true },
   'Hạ Vy': { key_c: 'Hạ Vy', name_c: 'Hạ Vy', url_c: '/characters/Hạ Vy.png', built_in_c: true },
   'Mai': { key_c: 'Mai', name_c: 'Mai', url_c: '/characters/Mai.png', built_in_c: true },
   'Minh Khoa': { key_c: 'Minh Khoa', name_c: 'Minh Khoa', url_c: '/characters/Minh Khoa.png', built_in_c: true },
@@ -17,6 +17,7 @@ const builtInImages = {
   'Yến': { key_c: 'Yến', name_c: 'Yến', url_c: '/characters/Yến.png', built_in_c: true },
   'Cyber-M': { key_c: 'Cyber-M', name_c: 'Cyber-M', url_c: '/characters/Cyber-M.png', built_in_c: true }
 };
+
 let loading;
 let backgroundRemover;
 
@@ -85,7 +86,14 @@ export function loadCharacterImages() {
   return loading;
 }
 
-export function getCharacterImage(name) { return images.get(name) || builtInImages[name]; }
+// === TỰ ĐỘNG GỌI LOAD NGAY KHI IMPORT FILE ĐỂ TRÁNH TRƯỜNG HỢP ẢNH BỊ TRỐNG ===
+loadCharacterImages().catch(err => console.error('Lỗi khởi tạo ảnh nhân vật:', err));
+
+export function getCharacterImage(name) { 
+  // Trả về ảnh tùy chỉnh trong DB nếu có, nếu không thì lấy ảnh mặc định trong builtInImages, 
+  // phòng hờ trường hợp map chưa kịp load xong thì vẫn trả về object chứa url chuẩn từ public folder.
+  return images.get(name) || builtInImages[name]; 
+}
 
 export function subscribeCharacterImages(listener) {
   listeners.add(listener);
@@ -124,14 +132,12 @@ export function characterName(name) {
 
 export function characterText(text = '') {
   let result = text;
-  // Hợp nhất cả ảnh tùy chỉnh trong IndexedDB lẫn ảnh mặc định builtInImages
   const allEntries = [
     ...Object.entries(builtInImages),
     ...images.entries()
   ];
 
   allEntries.sort(([a], [b]) => b.length - a.length).forEach(([key, row]) => {
-    // Escape ký tự gạch ngang '-' trong key 'Cyber-M' để Regex không bị lỗi
     const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     result = result.replace(new RegExp(`(^|[^\\p{L}])${escapedKey}(?=$|[^\\p{L}])`, 'gu'), (_, prefix) => `${prefix}${row.name_c}`);
   });
