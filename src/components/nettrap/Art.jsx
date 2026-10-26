@@ -1,3 +1,18 @@
+import { useEffect, useId, useState } from 'react';
+import { getCharacterImage, loadCharacterImages, subscribeCharacterImages } from './characterImages';
+import { BACKDROPS } from './Backdrops';
+
+const emotionLabels = { neutral: 'bình tĩnh', happy: 'vui mừng', scared: 'sợ hãi', shocked: 'hoang mang', confused: 'hoang mang', determined: 'kiên cường', suspicious: 'suy tư', angry: 'giận dữ' };
+
+function EmotionMarks({ emotion }) {
+  return <g aria-hidden="true" fill="none" strokeWidth="4" strokeLinecap="round">
+    {emotion === 'happy' && <g stroke="var(--warning)"><path d="M90 150v28m-14-14h28M377 90v32m-16-16h32M358 189l12 14 12-14"/><path d="M105 285l16 7m-13 6 16 7M348 285l-16 7m13 6-16 7" stroke="var(--primary)"/></g>}
+    {emotion === 'scared' && <g stroke="var(--chart-2)"><path d="M352 211q-18 25 0 25q18 0 0-25Z" fill="var(--chart-2)" fillOpacity=".5"/><path d="M165 201v25m10-25v20m10-20v16M96 280l-8 10 8 10-8 10M369 280l8 10-8 10 8 10"/></g>}
+    {(emotion === 'confused' || emotion === 'shocked') && <g stroke="var(--warning)"><path d="M347 139q0-24 19-24t19 20q0 12-19 20v13m0 15v2M111 176v-32m0 46v2"/></g>}
+    {emotion === 'determined' && <g stroke="var(--primary)"><path d="M77 255l38-10M80 275l33-6M364 245l38 10M366 269l33 6"/></g>}
+  </g>;
+}
+
 export function Portrait({ name, variant = 'detective', emotion = 'neutral', framing = 'full', className = '', ...props }) {
   const id = useId().replace(/:/g, '');
   const [, refresh] = useState(0);
@@ -7,10 +22,7 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     return unsubscribe;
   }, []);
 
-  // Ép lấy đúng tên nhân vật, nếu không truyền gì mà variant là suspect/khác thì mặc định Cyber-M
   const targetName = name || (variant === 'detective' ? 'An' : 'Cyber-M');
-  
-  // Lấy ảnh từ helper, nếu chưa có thì tự động ép một đối tượng chứa đường dẫn file ảnh trong public
   let image = getCharacterImage(targetName);
   if (!image || targetName === 'Cyber-M') {
     image = {
@@ -20,15 +32,9 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     };
   }
 
-  const suspect = variant === 'suspect';
-  const victim = variant === 'victim';
-  const shocked = ['shocked', 'scared', 'confused'].includes(emotion);
-  const angry = ['angry', 'suspicious', 'determined'].includes(emotion);
-  const happy = emotion === 'happy';
   const viewBox = '0 0 626 1015';
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
 
-  // LUÔN TRẢ VỀ THẺ <image> ĐỂ HIỆN ẢNH PNG THAY VÌ VẼ SVG CODE
   return (
     <svg viewBox={viewBox} className={className} role="img" aria-label={label} {...props}>
       <image 
@@ -40,4 +46,9 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
       <EmotionMarks emotion={emotion}/>
     </svg>
   );
+}
+
+export default function SceneArt({ scene = 'maze-hub', className = '', ...props }) {
+  const Backdrop = BACKDROPS[scene] || BACKDROPS['maze-hub'];
+  return <Backdrop className={className} {...props}/>;
 }
