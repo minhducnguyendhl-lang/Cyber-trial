@@ -1,31 +1,23 @@
-import { toast } from 'sonner';
-
 const databaseName = 'cyber-m-character-art';
 const listeners = new Set();
 const images = new Map();
+
 const builtInImages = {
-  'An': { key_c: 'An', name_c: 'An', url_c: '/characters/an.png', built_in_c: true },
-  'Bảo Linh': { key_c: 'Bảo Linh', name_c: 'Bảo Linh', url_c: '/characters/Bảo Linh.png', built_in_c: true },
-  'Phúc': { key_c: 'Phúc', name_c: 'Phúc', url_c: '/characters/Phúc.png', built_in_c: true },
-  'Đức': { key_c: 'Đức', name_c: 'Đức', url_c: '/characters/Đức.png', built_in_c: true },
-  'Hạ Vy': { key_c: 'Hạ Vy', name_c: 'Hạ Vy', url_c: '/characters/Hạ Vy.png', built_in_c: true },
-  'Mai': { key_c: 'Mai', name_c: 'Mai', url_c: '/characters/Mai.png', built_in_c: true },
-  'Minh Khoa': { key_c: 'Minh Khoa', name_c: 'Minh Khoa', url_c: '/characters/Minh Khoa.png', built_in_c: true },
-  'Quân': { key_c: 'Quân', name_c: 'Quân', url_c: '/characters/Quân.png', built_in_c: true },
-  'Trâm': { key_c: 'Trâm', name_c: 'Trâm', url_c: '/characters/Trâm.png', built_in_c: true },
-  'Vũ Khải': { key_c: 'Vũ Khải', name_c: 'Vũ Khải', url_c: '/characters/Vũ Khải.png', built_in_c: true },
-  'Yến': { key_c: 'Yến', name_c: 'Yến', url_c: '/characters/Yến.png', built_in_c: true },
-  'Cyber-M': { key_c: 'Cyber-M', name_c: 'Cyber-M', url_c: '/characters/Cyber-M.png', built_in_c: true }
+  'An': { key: 'An', key_c: 'An', name: 'An', name_c: 'An', url: '/characters/an.png', url_c: '/characters/an.png', built_in_c: true },
+  'Bảo Linh': { key: 'Bảo Linh', key_c: 'Bảo Linh', name: 'Bảo Linh', name_c: 'Bảo Linh', url: '/characters/Bảo Linh.png', url_c: '/characters/Bảo Linh.png', built_in_c: true },
+  'Phúc': { key: 'Phúc', key_c: 'Phúc', name: 'Phúc', name_c: 'Phúc', url: '/characters/Phúc.png', url_c: '/characters/Phúc.png', built_in_c: true },
+  'Đức': { key: 'Đức', key_c: 'Đức', name: 'Đức', name_c: 'Đức', url: '/characters/Đức.png', url_c: '/characters/Đức.png', built_in_c: true },
+  'Hạ Vy': { key: 'Hạ Vy', key_c: 'Hạ Vy', name: 'Hạ Vy', name_c: 'Hạ Vy', url: '/characters/Hạ Vy.png', url_c: '/characters/Hạ Vy.png', built_in_c: true },
+  'Mai': { key: 'Mai', key_c: 'Mai', name: 'Mai', name_c: 'Mai', url: '/characters/Mai.png', url_c: '/characters/Mai.png', built_in_c: true },
+  'Minh Khoa': { key: 'Minh Khoa', key_c: 'Minh Khoa', name: 'Minh Khoa', name_c: 'Minh Khoa', url: '/characters/Minh Khoa.png', url_c: '/characters/Minh Khoa.png', built_in_c: true },
+  'Quân': { key: 'Quân', key_c: 'Quân', name: 'Quân', name_c: 'Quân', url: '/characters/Quân.png', url_c: '/characters/Quân.png', built_in_c: true },
+  'Trâm': { key: 'Trâm', key_c: 'Trâm', name: 'Trâm', name_c: 'Trâm', url: '/characters/Trâm.png', url_c: '/characters/Trâm.png', built_in_c: true },
+  'Vũ Khải': { key: 'Vũ Khải', key_c: 'Vũ Khải', name: 'Vũ Khải', name_c: 'Vũ Khải', url: '/characters/Vũ Khải.png', url_c: '/characters/Vũ Khải.png', built_in_c: true },
+  'Yến': { key: 'Yến', key_c: 'Yến', name: 'Yến', name_c: 'Yến', url: '/characters/Yến.png', url_c: '/characters/Yến.png', built_in_c: true },
+  'Cyber-M': { key: 'Cyber-M', key_c: 'Cyber-M', name: 'Cyber-M', name_c: 'Cyber-M', url: '/characters/Cyber-M.png', url_c: '/characters/Cyber-M.png', built_in_c: true }
 };
 
 let loading;
-let backgroundRemover;
-
-async function cutout(file) {
-  backgroundRemover ??= import('@imgly/background-removal');
-  const { removeBackground } = await backgroundRemover;
-  return removeBackground(file);
-}
 
 async function storePortrait(row) {
   const db = await openDatabase();
@@ -38,28 +30,6 @@ async function storePortrait(row) {
       transaction.onabort = () => reject(transaction.error);
     });
   } finally { db.close(); }
-}
-
-async function preparePortraits(rows) {
-  const pending = rows.filter(row => !row.cutout_c);
-  if (!pending.length) return;
-  const notification = toast.loading('Đang tách nền chân dung… Lần đầu cần tải mô hình xử lý ảnh.');
-  let failed = 0;
-  for (const row of pending) {
-    try {
-      const prepared = { ...row, file_c: await cutout(row.file_c), cutout_c: true };
-      await storePortrait(prepared);
-      const previous = images.get(row.key_c);
-      images.set(row.key_c, { ...prepared, url_c: URL.createObjectURL(prepared.file_c) });
-      if (previous) URL.revokeObjectURL(previous.url_c);
-      listeners.forEach(listener => listener());
-    } catch {
-      failed += 1;
-    }
-  }
-  toast.dismiss(notification);
-  if (failed) toast.error(`Chưa tách được nền ${failed} chân dung. Ảnh gốc được giữ nguyên; tải lại khi có kết nối để thử lại.`);
-  else toast.success('Đã tách nền và lưu các chân dung trên thiết bị này.');
 }
 
 function openDatabase() {
@@ -75,33 +45,47 @@ export function loadCharacterImages() {
   if (!loading) loading = openDatabase().then(db => new Promise((resolve, reject) => {
     const request = db.transaction('portraits').objectStore('portraits').getAll();
     request.onsuccess = () => {
-      request.result.forEach(row => images.set(row.key_c, { ...row, url_c: URL.createObjectURL(row.file_c) }));
+      request.result.forEach(row => {
+        const k = row.key_c || row.key;
+        const fileObj = row.file_c || row.file;
+        const u = fileObj ? URL.createObjectURL(fileObj) : (builtInImages[k]?.url || `/characters/${k}.png`);
+        images.set(k, { ...row, url: u, url_c: u });
+      });
       db.close();
       listeners.forEach(listener => listener());
       resolve();
-      void preparePortraits(request.result);
     };
     request.onerror = () => { db.close(); reject(request.error); };
   }));
   return loading;
 }
 
-// Tự động load ngay khi import
 loadCharacterImages().catch(() => {});
 
 export function getCharacterImage(name) {
-  // 1. Kiểm tra trong bộ nhớ đệm hoặc DB
-  if (images.has(name)) return images.get(name);
-  // 2. Kiểm tra trong danh sách mặc định
-  if (builtInImages[name]) return builtInImages[name];
+  if (!name) return null;
+  const targetKey = String(name).trim();
+  const found = images.get(targetKey) || builtInImages[targetKey];
   
-  // 3. FALLBACK AN TOÀN: Nếu component truyền tên khác một chút (ví dụ chữ thường/hoa), 
-  // tự động trả về một object ảnh dựa trên tên đó trỏ thẳng vào thư mục public/characters/
-  const normalizedKey = name.trim();
+  if (found) {
+    const finalUrl = found.url || found.url_c;
+    const finalName = found.name || found.name_c;
+    return {
+      ...found,
+      url: finalUrl,
+      url_c: finalUrl,
+      name: finalName,
+      name_c: finalName
+    };
+  }
+
   return {
-    key_c: normalizedKey,
-    name_c: normalizedKey,
-    url_c: `/characters/${normalizedKey}.png`,
+    key: targetKey,
+    key_c: targetKey,
+    name: targetKey,
+    name_c: targetKey,
+    url: `/characters/${targetKey}.png`,
+    url_c: `/characters/${targetKey}.png`,
     built_in_c: true
   };
 }
@@ -112,33 +96,34 @@ export function subscribeCharacterImages(listener) {
 }
 
 export async function saveCharacterImage(key, file) {
-  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Chọn ảnh PNG, JPG hoặc WebP.');
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Chọn ảnh định dạng PNG, JPG hoặc WebP.');
   if (file.size > 15 * 1024 * 1024) throw new Error('Ảnh cần nhỏ hơn 15 MB.');
-  const url = URL.createObjectURL(file);
+  const tempUrl = URL.createObjectURL(file);
   try {
     await new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = resolve;
-      image.onerror = () => reject(new Error('Không đọc được ảnh đã chọn.'));
-      image.src = url;
+      image.onerror = () => reject(new Error('Không đọc được ảnh.'));
+      image.src = tempUrl;
     });
     await loadCharacterImages();
-    const prepared = await cutout(file);
-    const row = { key_c: key, name_c: file.name.replace(/\.[^.]+$/, ''), file_c: prepared, cutout_c: true };
+    const row = { key: key, key_c: key, name: file.name.replace(/\.[^.]+$/, ''), name_c: file.name.replace(/\.[^.]+$/, ''), file: file, file_c: file, cutout: true, cutout_c: true };
     await storePortrait(row);
     const previous = images.get(key);
-    if (previous) URL.revokeObjectURL(previous.url_c);
-    images.set(key, { ...row, url_c: URL.createObjectURL(prepared) });
-    URL.revokeObjectURL(url);
+    if (previous?.url) URL.revokeObjectURL(previous.url);
+    const newUrl = URL.createObjectURL(file);
+    images.set(key, { ...row, url: newUrl, url_c: newUrl });
+    URL.revokeObjectURL(tempUrl);
     listeners.forEach(listener => listener());
   } catch (error) {
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(tempUrl);
     throw error;
   }
 }
 
 export function characterName(name) { 
-  return images.get(name)?.name_c || builtInImages[name]?.name_c || name; 
+  const res = getCharacterImage(name);
+  return res?.name || res?.name_c || name; 
 }
 
 export function characterText(text = '') {
@@ -150,7 +135,8 @@ export function characterText(text = '') {
 
   allEntries.sort(([a], [b]) => b.length - a.length).forEach(([key, row]) => {
     const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    result = result.replace(new RegExp(`(^|[^\\p{L}])${escapedKey}(?=$|[^\\p{L}])`, 'gu'), (_, prefix) => `${prefix}${row.name_c}`);
+    const displayName = row.name || row.name_c || key;
+    result = result.replace(new RegExp(`(^|[^\\p{L}])${escapedKey}(?=$|[^\\p{L}])`, 'gu'), (_, prefix) => `${prefix}${displayName}`);
   });
 
   return result;
