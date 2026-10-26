@@ -118,52 +118,8 @@ export async function saveCharacterImage(key, file) {
   }
 }
 
-// === THÊM HÀM NÀY VÀO ĐÂY ===
 export function characterName(name) { 
   return images.get(name)?.name_c || builtInImages[name]?.name_c || name; 
-}
-
-export function characterText(text = '') {
-  let result = text;
-  // Hợp nhất cả ảnh tùy chỉnh trong IndexedDB lẫn ảnh mặc định builtInImages
-  const allEntries = [
-    ...Object.entries(builtInImages),
-    ...images.entries()
-  ];
-
-  allEntries.sort(([a], [b]) => b.length - a.length).forEach(([key, row]) => {
-    // Escape ký tự gạch ngang '-' trong key 'Cyber-M' để Regex không bị lỗi
-    const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    result = result.replace(new RegExp(`(^|[^\\p{L}])${escapedKey}(?=$|[^\\p{L}])`, 'gu'), (_, prefix) => `${prefix}${row.name_c}`);
-  });
-
-  return result;
-}
-
-export async function saveCharacterImage(key, file) {
-  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Chọn ảnh PNG, JPG hoặc WebP.');
-  if (file.size > 15 * 1024 * 1024) throw new Error('Ảnh cần nhỏ hơn 15 MB.');
-  const url = URL.createObjectURL(file);
-  try {
-    await new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = resolve;
-      image.onerror = () => reject(new Error('Không đọc được ảnh đã chọn.'));
-      image.src = url;
-    });
-    await loadCharacterImages();
-    const prepared = await cutout(file);
-    const row = { key_c: key, name_c: file.name.replace(/\.[^.]+$/, ''), file_c: prepared, cutout_c: true };
-    await storePortrait(row);
-    const previous = images.get(key);
-    if (previous) URL.revokeObjectURL(previous.url_c);
-    images.set(key, { ...row, url_c: URL.createObjectURL(prepared) });
-    URL.revokeObjectURL(url);
-    listeners.forEach(listener => listener());
-  } catch (error) {
-    URL.revokeObjectURL(url);
-    throw error;
-  }
 }
 
 export function characterText(text = '') {
