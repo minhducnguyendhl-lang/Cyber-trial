@@ -28,8 +28,16 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     url_c: `/characters/${targetName}.png`
   };
 
-  // Cấu hình viewBox chuẩn góc nhìn nửa thân trên (tập trung vào từ đầu tới ngang ngực)
-  const viewBox = '80 80 460 520';
+  // Tùy chỉnh viewBox riêng cho từng nhân vật:
+  // - An: Thu nhỏ viewBox lại để phóng to ảnh lên
+  // - Cyber-M: Mở rộng viewBox ra để thu nhỏ ảnh lại vừa vặn khung bên phải
+  let viewBox = '80 80 460 520';
+  if (targetName === 'An') {
+    viewBox = '130 110 360 420'; // Ảnh An hiển thị to/cận cảnh hơn
+  } else if (targetName === 'Cyber-M') {
+    viewBox = '0 0 626 1015'; // Ảnh Cyber-M hiển thị nhỏ gọn lại
+  }
+
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
 
   return (
