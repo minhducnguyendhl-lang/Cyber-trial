@@ -28,10 +28,9 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     url_c: `/characters/${targetName}.png`
   };
 
-  // Mở rộng khung viewBox để hiển thị trọn vẹn phần đầu và nửa thân trên (thấy cả tay và áo)
-  // Sử dụng 'meet' thay vì 'slice' để ảnh tự động co giãn vừa vặn, không bị phóng to quá khổ ở bên phải
-  const viewBox = framing === 'bust' ? '30 10 566 700' : '10 0 606 850';
-  const preserveAspectRatio = 'xMidYMax meet';
+  // Cố định 100% chuẩn khung viewbox và chế độ slice để tất cả nhân vật đều đều tăm tắp
+  const viewBox = '90 60 445 520';
+  const preserveAspectRatio = 'xMidYMid slice';
 
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
 
