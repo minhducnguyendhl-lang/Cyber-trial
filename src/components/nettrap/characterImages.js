@@ -3,7 +3,7 @@ const listeners = new Set();
 const images = new Map();
 
 const builtInImages = {
-  'An': { key: 'An', key_c: 'An', name: 'An', name_c: 'An', url: '/characters/an.png', url_c: '/characters/an.png', built_in_c: true },
+  'An': { key: 'An', key_c: 'An', name: 'An', name_c: 'An', url: '/characters/An.png', url_c: '/characters/An.png', built_in_c: true },
   'Bảo Linh': { key: 'Bảo Linh', key_c: 'Bảo Linh', name: 'Bảo Linh', name_c: 'Bảo Linh', url: '/characters/Bảo Linh.png', url_c: '/characters/Bảo Linh.png', built_in_c: true },
   'Phúc': { key: 'Phúc', key_c: 'Phúc', name: 'Phúc', name_c: 'Phúc', url: '/characters/Phúc.png', url_c: '/characters/Phúc.png', built_in_c: true },
   'Đức': { key: 'Đức', key_c: 'Đức', name: 'Đức', name_c: 'Đức', url: '/characters/Đức.png', url_c: '/characters/Đức.png', built_in_c: true },
