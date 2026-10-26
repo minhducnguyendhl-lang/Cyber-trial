@@ -28,8 +28,8 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     url_c: `/characters/${targetName}.png`
   };
 
-  // Thu nhỏ/cắt khung viewBox tập trung vào phần ngực trở lên (nửa thân trên)
-  const viewBox = '50 50 520 600';
+  // Cấu hình viewBox chuẩn góc nhìn nửa thân trên (tập trung vào từ đầu tới ngang ngực)
+  const viewBox = '80 80 460 520';
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
 
   return (
@@ -38,7 +38,7 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
         href={image.url || image.url_c} 
         width="626" 
         height="1015" 
-        preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMidYMid slice"
       />
       <EmotionMarks emotion={emotion}/>
     </svg>
