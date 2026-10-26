@@ -28,15 +28,9 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     url_c: `/characters/${targetName}.png`
   };
 
-  // Tùy chỉnh viewBox riêng cho từng nhân vật:
-  // - An: Thu nhỏ viewBox lại để phóng to ảnh lên
-  // - Cyber-M: Mở rộng viewBox ra để thu nhỏ ảnh lại vừa vặn khung bên phải
-  let viewBox = '80 80 460 520';
-  if (targetName === 'An') {
-    viewBox = '130 110 360 420'; // Ảnh An hiển thị to/cận cảnh hơn
-  } else if (targetName === 'Cyber-M') {
-    viewBox = '0 0 626 1015'; // Ảnh Cyber-M hiển thị nhỏ gọn lại
-  }
+  // Điều chỉnh viewBox để nhân vật cao và nổi bật hơn trong khung
+  const viewBox = '130 95 360 390';
+  const preserveAspectRatio = 'xMidYMid slice';
 
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
 
@@ -46,7 +40,7 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
         href={image.url || image.url_c} 
         width="626" 
         height="1015" 
-        preserveAspectRatio="xMidYMid slice"
+        preserveAspectRatio={preserveAspectRatio}
       />
       <EmotionMarks emotion={emotion}/>
     </svg>
