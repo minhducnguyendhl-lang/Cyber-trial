@@ -4,6 +4,22 @@ import { BACKDROPS } from './Backdrops';
 
 const emotionLabels = { neutral: 'bình tĩnh', happy: 'vui mừng', scared: 'sợ hãi', shocked: 'hoang mang', confused: 'hoang mang', determined: 'kiên cường', suspicious: 'suy tư', angry: 'giận dữ' };
 
+// Bảng chuẩn hóa viewBox riêng cho từng nhân vật để ép tất cả về cùng một kích thước và vị trí nửa thân trên chuẩn xác nhất
+const characterViewBoxes = {
+  'An': '110 80 400 460',
+  'Mai': '110 80 400 460',
+  'Bảo Linh': '110 80 400 460',
+  'Phúc': '110 80 400 460',
+  'Đức': '110 80 400 460',
+  'Trâm': '110 80 400 460',
+  'Quân': '110 80 400 460',
+  'Minh Khoa': '110 80 400 460',
+  'Hạ Vy': '110 80 400 460',
+  'Vũ Khải': '110 80 400 460',
+  'Yến': '110 80 400 460',
+  'Cyber-M': '110 80 400 460'
+};
+
 function EmotionMarks({ emotion }) {
   return <g aria-hidden="true" fill="none" strokeWidth="4" strokeLinecap="round">
     {emotion === 'happy' && <g stroke="var(--warning)"><path d="M90 150v28m-14-14h28M377 90v32m-16-16h32M358 189l12 14 12-14"/><path d="M105 285l16 7m-13 6 16 7M348 285l-16 7m13 6-16 7" stroke="var(--primary)"/></g>}
@@ -28,8 +44,8 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
     url_c: `/characters/${targetName}.png`
   };
 
-  // Cố định 100% chuẩn khung viewbox và chế độ slice để tất cả nhân vật đều đều tăm tắp
-  const viewBox = '90 60 445 520';
+  // Lấy viewBox theo tên nhân vật, nếu chưa có thì dùng mặc định chuẩn của An
+  const viewBox = characterViewBoxes[targetName] || '110 80 400 460';
   const preserveAspectRatio = 'xMidYMid slice';
 
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
