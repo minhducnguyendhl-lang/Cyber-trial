@@ -23,16 +23,13 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
   }, []);
 
   const targetName = name || (variant === 'detective' ? 'An' : 'Cyber-M');
-  let image = getCharacterImage(targetName);
-  if (!image || targetName === 'Cyber-M') {
-    image = {
-      url: '/characters/Cyber-M.png',
-      url_c: '/characters/Cyber-M.png',
-      built_in_c: true
-    };
-  }
+  const image = getCharacterImage(targetName) || {
+    url: `/characters/${targetName}.png`,
+    url_c: `/characters/${targetName}.png`
+  };
 
-  const viewBox = '0 0 626 1015';
+  // Thu nhỏ/cắt khung viewBox tập trung vào phần ngực trở lên (nửa thân trên)
+  const viewBox = '50 50 520 600';
   const label = `${targetName} — ${emotionLabels[emotion] || emotionLabels.neutral}`;
 
   return (
@@ -41,7 +38,7 @@ export function Portrait({ name, variant = 'detective', emotion = 'neutral', fra
         href={image.url || image.url_c} 
         width="626" 
         height="1015" 
-        preserveAspectRatio="xMidYMax meet"
+        preserveAspectRatio="xMidYMid meet"
       />
       <EmotionMarks emotion={emotion}/>
     </svg>
