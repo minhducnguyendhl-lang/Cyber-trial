@@ -86,13 +86,24 @@ export function loadCharacterImages() {
   return loading;
 }
 
-// === TỰ ĐỘNG GỌI LOAD NGAY KHI IMPORT FILE ĐỂ TRÁNH TRƯỜNG HỢP ẢNH BỊ TRỐNG ===
-loadCharacterImages().catch(err => console.error('Lỗi khởi tạo ảnh nhân vật:', err));
+// Tự động load ngay khi import
+loadCharacterImages().catch(() => {});
 
-export function getCharacterImage(name) { 
-  // Trả về ảnh tùy chỉnh trong DB nếu có, nếu không thì lấy ảnh mặc định trong builtInImages, 
-  // phòng hờ trường hợp map chưa kịp load xong thì vẫn trả về object chứa url chuẩn từ public folder.
-  return images.get(name) || builtInImages[name]; 
+export function getCharacterImage(name) {
+  // 1. Kiểm tra trong bộ nhớ đệm hoặc DB
+  if (images.has(name)) return images.get(name);
+  // 2. Kiểm tra trong danh sách mặc định
+  if (builtInImages[name]) return builtInImages[name];
+  
+  // 3. FALLBACK AN TOÀN: Nếu component truyền tên khác một chút (ví dụ chữ thường/hoa), 
+  // tự động trả về một object ảnh dựa trên tên đó trỏ thẳng vào thư mục public/characters/
+  const normalizedKey = name.trim();
+  return {
+    key_c: normalizedKey,
+    name_c: normalizedKey,
+    url_c: `/characters/${normalizedKey}.png`,
+    built_in_c: true
+  };
 }
 
 export function subscribeCharacterImages(listener) {
