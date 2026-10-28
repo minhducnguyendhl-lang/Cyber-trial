@@ -9,10 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@imgly/background-removal": "^1.7.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@google/genai": "^2.31.0",
+    "@imgly/background-removal": "^1.7.0",
     "@reduxjs/toolkit": "2.12.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "@vitejs/plugin-react": "^6.0.2",
+    "localtunnel": "^2.0.2",
     "shadcn": "^4.10.0",
     "tailwindcss": "4.3.0",
     "vite": "^8.0.13"
