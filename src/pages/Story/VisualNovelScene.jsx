@@ -78,7 +78,7 @@ export default function VisualNovelScene() {
       <div className="panel-cut min-h-60 border border-border bg-background/95 p-5 shadow-lg sm:p-7">
         <div className="mb-4 flex items-center justify-between gap-3">
           <span className="panel-cut min-w-0 break-words bg-primary px-5 py-1 font-heading text-xl font-bold text-primary-foreground">{characterName(node.speaker_c)}</span>
-          <span className="shrink-0 text-xs text-muted-foreground">{node.warning_c && node.speaker_c === 'Cyber-M' ? 'Thông báo sự cố' : node.investigation_c != null ? 'Khám nghiệm chứng cứ' : ({ happy: 'Vui mừng', scared: 'Sợ hãi', shocked: 'Hoang mang', confused: 'Hoang mang', determined: 'Kiên cường' }[node.emotion_c] || 'Đối thoại')}</span>
+          <span className="shrink-0 text-xs text-muted-foreground">{node.warning_c && node.speaker_c === 'Cyber-M' ? 'Thông báo sự cố' : node.investigation_c != null ? 'Khám nghiệm chứng cứ' : ({ neutral: 'Bình tĩnh', happy: 'Vui mừng', scared: 'Sợ hãi', shocked: 'Hoang mang', confused: 'Hoang mang', determined: 'Kiên cường', suspicious: 'Suy tư', angry: 'Giận dữ' }[node.emotion_c] || 'Đối thoại')}</span>
         </div>
         <button type="button" onClick={next} className="game-focus block min-h-20 w-full whitespace-pre-wrap break-words text-left text-base leading-[1.9] sm:text-lg" aria-label={visible < text.length ? 'Hiện toàn bộ hội thoại' : 'Đọc tiếp hội thoại'}>
           {text.slice(0, visible)}
