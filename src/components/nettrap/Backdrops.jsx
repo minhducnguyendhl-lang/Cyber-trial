@@ -319,6 +319,48 @@ export function HubBackdrop(props) {
   </Frame>;
 }
 
+export function CityBackdrop(props) {
+  return <Frame scene="city" label="Quảng trường trung tâm mê cung số, màn hình Vũ Khải và sáu hồ sơ vụ án" {...props}>
+    <rect x="0" y="0" width="1000" height="430" fill="var(--card)" stroke="var(--border)" strokeWidth="3"/>
+    <g transform="translate(120 95)">
+      <rect width="760" height="250" rx="12" fill="var(--background)" stroke="var(--chart-2)" strokeWidth="6"/>
+      <text x="28" y="42" fill="var(--primary)" fontSize="22" fontFamily="monospace" fontWeight="700">VŨ KHẢI / FINAL AUDIT</text>
+      {[0,1,2,3,4,5].map(i => <g key={i} transform={`translate(${40 + (i % 3) * 240} ${78 + Math.floor(i / 3) * 88})`}>
+        <rect width="200" height="62" rx="8" fill="var(--secondary)" stroke="var(--border)" strokeWidth="3"/>
+        <circle cx="24" cy="31" r="10" fill="var(--chart-2)"/>
+        <path d="M48 20h128M48 40h96" stroke="var(--muted-foreground)" strokeWidth="3"/>
+      </g>)}
+      <path d="M40 260h680" stroke="var(--primary)" strokeWidth="4"/>
+      <text x="40" y="290" fill="var(--destructive)" fontSize="14" fontFamily="monospace">SOURCE CHAIN: INDEPENDENT · AUDIT: VK-01</text>
+    </g>
+    <ellipse cx="500" cy="500" rx="390" ry="95" fill="var(--background)" fillOpacity=".85" stroke="var(--chart-2)" strokeWidth="5"/>
+    <g transform="translate(468 455)">
+      <rect width="64" height="90" rx="6" fill="var(--secondary)" stroke="var(--primary)" strokeWidth="4"/>
+      <circle cx="32" cy="24" r="12" fill="var(--chart-2)"/>
+      <path d="M18 58h28" stroke="var(--muted-foreground)" strokeWidth="4"/>
+    </g>
+    <text x="500" y="620" textAnchor="middle" fill="var(--primary)" fontSize="16" fontFamily="monospace">TRUNG TÂM MÊ CUNG SỐ / FINAL BOSS ARENA</text>
+  </Frame>;
+}
+
+export function DigitalBackdrop(props) {
+  return <Frame scene="digital" label="Màn hình giao dịch, nhật ký truy cập và buồng dữ liệu" {...props}>
+    <Screen x={80} y={90} width={420} height={250} title="TRANSACTION / SOURCE LOG">
+      <path d="M100 150h360m-360 28h250m-250 28h300" stroke="var(--primary)" strokeWidth="4"/>
+      <rect x="100" y="210" width="120" height="34" rx="4" fill="var(--warning)"/>
+      <text x="112" y="233" fill="var(--background)" fontSize="12" fontFamily="monospace" fontWeight="700">VK-01 BLOCKED</text>
+    </Screen>
+    <Screen x={530} y={90} width={390} height={250} title="ACCESS / IDENTITY VAULT">
+      {[0,1,2,3].map(i => <g key={i} transform={`translate(555 ${135 + i * 44})`}>
+        <rect width="340" height="34" rx="4" fill="var(--secondary)" stroke="var(--border)" strokeWidth="2"/>
+        <circle cx="18" cy="17" r="7" fill={(i===2?'var(--destructive)':'var(--chart-2)')}/>
+        <path d="M40 17h180" stroke="var(--muted-foreground)" strokeWidth="3"/>
+      </g>)}
+    </Screen>
+    <text x="500" y="620" textAnchor="middle" fill="var(--muted-foreground)" fontSize="15" fontFamily="monospace">DIGITAL VAULT / SOURCE RECORDS</text>
+  </Frame>;
+}
+
 export function CourtBackdrop(props) {
   return <Frame scene="court" label="Phòng tranh luận hình tròn với mười bục và màn hình Cyber-M trung tâm" {...props}>
     <ellipse cx="500" cy="341" rx="435" ry="254" fill="var(--background)" fillOpacity=".38" stroke="var(--chart-2)" strokeWidth="5"/>
@@ -347,8 +389,30 @@ export function CourtBackdrop(props) {
   </Frame>;
 }
 
+export function CafeBackdrop(props) {
+  return <Frame scene="cafe" label="Quán cà phê, màn hình điện thoại và tin nhắn giả mạo" {...props}>
+    <rect x="0" y="0" width="1000" height="430" fill="var(--card)" stroke="var(--border)" strokeWidth="3"/>
+    <g transform="translate(120 110)">
+      <rect width="360" height="220" rx="10" fill="var(--background)" stroke="var(--chart-2)" strokeWidth="5"/>
+      <text x="22" y="38" fill="var(--primary)" fontSize="18" fontFamily="monospace" fontWeight="700">MESSAGE / FAKE SUPPORT</text>
+      <path d="M24 70h312m-312 24h220m-220 24h260" stroke="var(--muted-foreground)" strokeWidth="4"/>
+      <rect x="24" y="150" width="150" height="42" rx="6" fill="var(--warning)"/>
+      <text x="40" y="177" fill="var(--background)" fontSize="12" fontFamily="monospace" fontWeight="700">LINK GIẢ MẠO</text>
+    </g>
+    <g transform="translate(560 130)">
+      <rect width="280" height="180" rx="10" fill="var(--secondary)" stroke="var(--border)" strokeWidth="4"/>
+      <circle cx="140" cy="90" r="46" fill="var(--background)" stroke="var(--chart-2)" strokeWidth="4"/>
+      <path d="M118 90h44m-22-22v44" stroke="var(--primary)" strokeWidth="4"/>
+    </g>
+    <text x="500" y="620" textAnchor="middle" fill="var(--muted-foreground)" fontSize="15" fontFamily="monospace">CAFE / PHISHING SCENE</text>
+  </Frame>;
+}
+
 export const BACKDROPS = {
   'white-room': WhiteRoomBackdrop,
+  'city': CityBackdrop,
+  'digital': DigitalBackdrop,
+  'cafe': CafeBackdrop,
   'maze-dorm': DormBackdrop,
   'maze-school': SchoolBackdrop,
   'maze-bank': BankBackdrop,
