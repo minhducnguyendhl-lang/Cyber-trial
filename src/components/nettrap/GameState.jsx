@@ -48,7 +48,7 @@ function readSave() {
       investigation_c: legacy ? [] : cleanIndices(raw.investigation_c, 5),
       sessions_c: sessions, completed_c: completed,
       route_c: !legacy && ['bad', 'independent'].includes(raw.route_c) ? raw.route_c : null,
-      ending_c: !legacy && ['bad', 'normal', 'true'].includes(raw.ending_c) ? raw.ending_c : null,
+      ending_c: !legacy && ['normal', 'true'].includes(raw.ending_c) ? raw.ending_c : null,
       has_session_c: !legacy && Boolean(raw.has_session_c),
       newest_c: Number.isInteger(raw.newest_c) ? raw.newest_c : null,
       settings_c: {
@@ -173,7 +173,7 @@ export function GameProvider({ children }) {
     setSave(s => {
       const completed = { ...s.completed_c, [s.active_c]: true };
       const route = s.active_c === 5 && ['bad', 'independent'].includes(outcome.route_c) ? outcome.route_c : s.route_c;
-      const ending = s.active_c === 6 && ['normal', 'true'].includes(outcome.ending_c) ? outcome.ending_c : route === 'bad' ? 'bad' : s.ending_c;
+      const ending = s.active_c === 6 && ['normal', 'true'].includes(outcome.ending_c) ? outcome.ending_c : s.ending_c;
       const next = s.active_c + 1;
       return { ...s, completed_c: completed, route_c: route, ending_c: ending,
         newest_c: next < CHAPTERS.length && !completed[next] && !(next === 6 && route !== 'independent') ? next : null };
