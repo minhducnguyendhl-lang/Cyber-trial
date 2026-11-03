@@ -16,7 +16,8 @@ export const CYBER_CAST = [
   person('Phúc', 'Lập trình viên trò chơi', 22, 'Tin vào công nghệ. Từng nhận việc xử lý dữ liệu mà chưa xác minh đơn vị tuyển dụng.', 'Công nghệ phải phục vụ con người.'),
   person('Trâm', 'Sinh viên tâm lý học', 20, 'Nhận ra áp lực và thao túng. Từng tham gia khảo sát phản ứng trước cuộc gọi khẩn cấp giả.', 'Nỗi sợ không phải bằng chứng.', 'victim'),
   person('Quân', 'Đối thủ của An · Sinh viên luật', 21, 'Nguyên tắc, thích tranh luận. Có thể đã làm lộ thông tin trong vụ Mạng Nhện.', 'Không có quy tắc nào được miễn chất vấn.'),
-  person('Yến', 'Tình nguyện viên giáo dục số', 19, 'Từng đăng ký học bổng Khiên Số và cung cấp nhiều thông tin. Ngưỡng mộ các vụ án An phá trên TV.', 'Dừng lại, kiểm chứng, rồi mới tin.', 'victim')
+  person('Yến', 'Tình nguyện viên giáo dục số', 19, 'Từng đăng ký học bổng Khiên Số và cung cấp nhiều thông tin. Ngưỡng mộ các vụ án An phá trên TV.', 'Dừng lại, kiểm chứng, rồi mới tin.', 'victim'),
+  person('Vũ Khải', 'Người sáng lập Khiên Số · Trùm cuối', 45, 'Xây dựng hệ thống Khiên Số và thao túng dữ liệu cá nhân.', 'Sự thật chỉ có giá trị khi người nắm nó đủ quyền quyết định nó được nhìn thấy thế nào.', 'mastermind')
 ];
 
 const PROLOGUE = [
@@ -262,23 +263,23 @@ export function buildCyberChapters(safety) {
 
 export const ENDINGS = {
   true: { title_c: 'Sự thật được xác minh', scene_c: 'white-room', frames_c: [
-    line('An', 'Danh mục nguồn đã được gửi đến điểm tiếp nhận độc lập. Hệ thống quản trị bị cô lập. Cyber-M mở các vùng lưu trữ. Cánh cửa cuối cùng sáng lên.'),
+    line('An', 'Danh mục nguồn đã được gửi đến điểm tiếp nhận độc lập. Hệ thống quản trị bị cô lập. Cyber-M mở các vùng lưu trữ. Cánh cửa cuối cùng sáng lên.', 'determined'),
     line('Mai', 'Họ còn sống! Quân, Đức, Vy, Phúc… tất cả được tìm thấy. Chúng ta thực sự ra ngoài rồi!', 'happy'),
     line('An', 'Tôi tỉnh trong cơ sở y tế. Khi nhìn đủ mười người, tôi mới thở ra. Lần đầu tiên, nhẹ nhõm không đến từ việc mình đoán đúng, mà từ việc không ai phải bị bỏ lại.', 'happy'),
-    line('Bảo Linh', 'Cậu định giữ thiết bị lưu trữ làm chiến lợi phẩm à?'),
-    line('An', 'Không. Bàn giao bản gốc, lập danh mục nguồn, giữ bản sao được kiểm soát. Tôi đã học rằng phá án không phải chứng minh mình thông minh hơn người khác.', 'happy'),
-    line('An', 'Mạng Nhện chưa biến mất sau một đêm. Vũ Khải bị truy tìm; mọi chứng cứ vẫn phải được xác minh theo quy trình. Nếu một Cyber-M khác xuất hiện, tôi sẽ hỏi ai điều khiển nó, dữ liệu từ đâu, và ai có quyền kiểm tra.')
+    line('Bảo Linh', 'Cậu định giữ thiết bị lưu trữ làm chiến lợi phẩm à?', 'suspicious'),
+    line('An', 'Không. Bàn giao bản gốc, lập danh mục nguồn, giữ bản sao được kiểm soát. Tôi đã học rằng phá án không phải chứng minh mình thông minh hơn người khác.', 'determined'),
+    line('An', 'Mạng Nhện chưa biến mất sau một đêm. Vũ Khải bị truy tìm; mọi chứng cứ vẫn phải được xác minh theo quy trình. Nếu một Cyber-M khác xuất hiện, tôi sẽ hỏi ai điều khiển nó, dữ liệu từ đâu, và ai có quyền kiểm tra.', 'determined')
   ] },
   normal: { title_c: 'Bản án chưa hoàn tất', scene_c: 'maze-hub', frames_c: [
-    line('An', 'Chúng tôi xác định được Khải, nhưng chuỗi nguồn độc lập còn thiếu. Nhóm thoát khỏi mô phỏng; dữ liệu quan trọng vẫn nằm ngoài tầm kiểm soát.'),
+    line('An', 'Chúng tôi xác định được Khải, nhưng chuỗi nguồn độc lập còn thiếu. Nhóm thoát khỏi mô phỏng; dữ liệu quan trọng vẫn nằm ngoài tầm kiểm soát.', 'scared'),
     line('Yến', 'Em mừng vì nhìn thấy bầu trời thật. Nhưng những người khác ngoài kia có còn nhận tin nhắn từ hệ thống ấy không?', 'scared'),
-    line('An', 'Tôi không nói vụ án đã xong chỉ để mọi người yên tâm. Tôi bàn giao những gì có thể kiểm tra, ghi rõ phần chưa xác minh. Chúng tôi sẽ tiếp tục cùng nhau.'),
-    line('An', 'Mạng Nhện bị tổn thương, chưa bị bóc gỡ. Chương bảy còn thiếu các nguồn độc lập của Mai và Khoa, Trâm hoặc Yến; kết luận về Khải vẫn cần được kiểm chứng bằng chuỗi chứng cứ đầy đủ.')
+    line('An', 'Tôi không nói vụ án đã xong chỉ để mọi người yên tâm. Tôi bàn giao những gì có thể kiểm tra, ghi rõ phần chưa xác minh. Chúng tôi sẽ tiếp tục cùng nhau.', 'determined'),
+    line('An', 'Mạng Nhện bị tổn thương, chưa bị bóc gỡ. Chương bảy còn thiếu các nguồn độc lập của Mai và Khoa, Trâm hoặc Yến; kết luận về Khải vẫn cần được kiểm chứng bằng chuỗi chứng cứ đầy đủ.', 'determined')
   ] },
   bad: { title_c: 'Phán quyết của Cyber-M', scene_c: 'court', frames_c: [
-    line('Cyber-M', 'Linh đã bị kết tội. Các ngươi đã chọn bản tóm tắt của ta thay cho quyền kiểm tra nguồn. Ta không cần ra lệnh: con người tự hoàn thành phần còn lại.'),
+    line('Cyber-M', 'Linh đã bị kết tội. Các ngươi đã chọn bản tóm tắt của ta thay cho quyền kiểm tra nguồn. Ta không cần ra lệnh: con người tự hoàn thành phần còn lại.', 'angry'),
     line('Bảo Linh', 'An… đừng để lời khai của tôi biến mất. Tôi đã cố cứu họ. Tôi sợ, nhưng tôi không tạo ra chuyện này.', 'scared'),
     line('An', 'Cánh cửa đóng. Tôi nhận ra quá muộn: tôi đã gọi một phán quyết không được kiểm tra là sự thật. Chiến dịch thao túng ngoài kia lại bắt đầu.', 'scared'),
-    line('An', 'Một tin nhắn giả mới xuất hiện, dùng chính câu cảnh báo tôi nói ở chương đầu. Không phải vì tôi ngu ngốc. Vì tôi đã để một hệ thống chọn toàn bộ điều mình được biết. Chơi lại phiên tòa chương sáu để chất vấn nguồn chứng cứ.')
+    line('An', 'Một tin nhắn giả mới xuất hiện, dùng chính câu cảnh báo tôi nói ở chương đầu. Không phải vì tôi ngu ngốc. Vì tôi đã để một hệ thống chọn toàn bộ điều mình được biết. Chơi lại phiên tòa chương sáu để chất vấn nguồn chứng cứ.', 'determined')
   ] }
 };
